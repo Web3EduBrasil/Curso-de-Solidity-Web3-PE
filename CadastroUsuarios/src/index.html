@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cadastro de Usuários - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-users"></i> Sistema de Cadastro de Usuários</h1>
+            <p>Gerenciamento de usuários na blockchain Arbitrum Sepolia</p>
+        </header>
+
+        <!-- Status da Conexão -->
+        <div class="connection-status" id="connectionStatus">
+            <i class="fas fa-circle"></i>
+            <span>Desconectado</span>
+        </div>
+
+        <!-- Seção de Conexão -->
+        <section class="card">
+            <h2><i class="fas fa-wallet"></i> Conexão com MetaMask</h2>
+            <div class="form-group">
+                <button id="connectBtn" class="btn btn-primary">
+                    <i class="fas fa-plug"></i> Conectar MetaMask
+                </button>
+                <div id="connectionInfo" class="info-box" style="display: none;">
+                    <p><strong>Conta:</strong> <span id="userAccount">-</span></p>
+                    <p><strong>Rede:</strong> <span id="networkName">-</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cadastrar Novo Usuário -->
+        <section class="card">
+            <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Usuário</h2>
+            <div class="form-group">
+                <label for="userName">Nome do Usuário:</label>
+                <input type="text" id="userName" placeholder="Digite o nome do usuário" maxlength="50">
+                <button id="registerBtn" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Cadastrar Usuário
+                </button>
+                <div id="registerStatus" class="status-message"></div>
+            </div>
+        </section>
+
+        <!-- Lista de Usuários -->
+        <section class="card">
+            <h2><i class="fas fa-list"></i> Lista de Usuários Cadastrados</h2>
+            <div class="form-group">
+                <button id="loadUsersBtn" class="btn btn-info">
+                    <i class="fas fa-refresh"></i> Carregar Usuários
+                </button>
+                <div id="loadStatus" class="status-message"></div>
+                <div id="usersList" class="users-list"></div>
+            </div>
+        </section>
+
+        <!-- Estatísticas -->
+        <section class="card">
+            <h2><i class="fas fa-chart-bar"></i> Estatísticas do Sistema</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Usuários Cadastrados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="contractAddress">-</div>
+                    <div class="stat-label">Endereço do Contrato</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Sistema de Cadastro de Usuários - Blockchain DApp</p>
+            <p>Desenvolvido para Arbitrum Sepolia Testnet</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
