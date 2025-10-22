@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrar & Consultar Nome — DApp</title>
+
+  <!-- Estilo moderno (glass + neon) -->
+  <style>
+    :root{
+      --bg1:#0f1226; --bg2:#1b1f3a;
+      --card:#101426cc; --border:#2b2f55;
+      --text:#e7e9ff; --muted:#a8adff;
+      --accent:#7c5cff; --accent-2:#3bf0d4; --danger:#ff6b6b;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #1d1e44 0%, transparent 60%),
+        radial-gradient(900px 600px at 110% 20%, #0c3a3a 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .container{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding:20px;
+    }
+
+    header.card{
+      grid-column:1 / -1;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:10px;
+      background: conic-gradient(from 180deg, var(--accent), var(--accent-2) 60%, var(--accent) 100%);
+      box-shadow:0 0 24px rgba(123,92,255,.5), inset 0 0 18px rgba(59,240,212,.35);
+    }
+    h1{
+      font-size:18px; margin:0; letter-spacing:.3px;
+    }
+    .muted{color:var(--muted); font-size:12px}
+
+    .row{
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+
+    label{font-size:12px; color:var(--muted); display:block; margin:6px 0}
+    input[type="text"], input[type="search"]{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #2c305a;
+      background:#0e1230;
+      color:var(--text);
+      outline:none;
+      transition: box-shadow .2s, border-color .2s, transform .02s;
+    }
+    input::placeholder{color:#8187c4}
+    input:focus{
+      border-color:#5560ff;
+      box-shadow:0 0 0 4px rgba(123,92,255,.15);
+    }
+
+    .btn{
+      border:1px solid #2c305a;
+      background:linear-gradient(180deg,#22286a,#1a1f55);
+      color:#fff;
+      padding:11px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600; letter-spacing:.2px;
+      transition: transform .05s ease, box-shadow .2s ease, border-color .2s;
+      user-select:none;
+    }
+    .btn:hover{box-shadow:0 8px 28px rgba(124,92,255,.25)}
+    .btn:active{transform: translateY(1px) scale(.99)}
+    .btn[disabled]{opacity:.6; cursor:not-allowed; filter:grayscale(.2)}
+    .btn-primary{
+      background:linear-gradient(180deg, #7c5cff, #5640ff);
+      border-color:#6c57ff;
+    }
+    .btn-ghost{
+      background:transparent;
+    }
+    .btn-danger{ background: linear-gradient(180deg, #ff7c7c, #ff4646); border-color:#ff8b8b; }
+
+    .stack{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .grow{flex:1}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background:#0c1238; border:1px solid #2c305a; color:#d2d6ff; font-size:12px;
+    }
+    .dot{width:8px;height:8px;border-radius:99px;background:#3bf0d4; box-shadow:0 0 10px #3bf0d4aa}
+    .dot.red{background:#ff6b6b; box-shadow:0 0 10px #ff6b6baa}
+
+    .section-title{font-weight:700; letter-spacing:.3px; margin:6px 0 2px 0}
+    .helper{font-size:12px;color:#9aa0ff;margin-top:6px}
+
+    .result{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:14px; background:#0a0f2b; border:1px dashed #39407e; border-radius:12px; padding:12px;
+      word-break:break-word; color:#d7dbff;
+    }
+
+    .toasts{position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; gap:10px; z-index:9999}
+    .toast{
+      padding:12px 14px; border-radius:12px; background:#0f1436; border:1px solid #2f3570; color:#e9ebff;
+      box-shadow: var(--shadow); max-width: min(340px, 90vw);
+    }
+    .toast.ok{border-color:#2f7a6f}
+    .toast.err{border-color:#7a2f2f}
+    .toast small{display:block; color:#aab0ff; margin-top:6px}
+    .fade-in{animation: fade .2s ease}
+    @keyframes fade { from{opacity:0; transform: translateY(4px)} to{opacity:1; transform:translateY(0)} }
+
+    @media (max-width: 880px){
+      .container{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header class="card">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>DApp • Registro de Nome</h1>
+          <div class="muted">Exemplo simples com MetaMask + ethers.js (v6)</div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <span id="netPill" class="pill"><span class="dot red"></span><span id="netLabel">desconectado</span></span>
+        <button id="btnConnect" class="btn btn-primary">Conectar carteira</button>
+      </div>
+    </header>
+
+    <!-- CONFIG / CONTRATO -->
+    <section class="card">
+      <div class="section-title">Configuração do Contrato</div>
+      <label for="contractAddress">Endereço do contrato (ex.: Sepolia)</label>
+      <div class="stack">
+        <input id="contractAddress" type="text" placeholder="0xSeuContratoAqui..." class="grow" />
+        <button id="btnLoad" class="btn">Carregar</button>
+      </div>
+      <div class="helper">Cole o endereço do contrato que implementa a ABI abaixo.</div>
+
+      <details style="margin-top:12px">
+        <summary class="muted" style="cursor:pointer">Ver ABI usada</summary>
+        <pre class="result" id="abiBox" style="white-space:pre-wrap; margin-top:8px"></pre>
+      </details>
+
+      <div class="helper" style="margin-top:12px">
+        Status: <span id="status" class="muted">aguardando conexão…</span>
+      </div>
+    </section>
+
+    <!-- CONTA -->
+    <section class="card">
+      <div class="section-title">Sua Conta</div>
+      <div class="row">
+        <div>
+          <label>Endereço</label>
+          <div id="accountBox" class="result">—</div>
+        </div>
+        <div>
+          <label>Saldo (ETH)</label>
+          <div id="balanceBox" class="result">—</div>
+        </div>
+      </div>
+      <div class="helper">Certifique-se de estar na mesma rede do contrato.</div>
+    </section>
+
+    <!-- REGISTRAR -->
+    <section class="card">
+      <div class="section-title">Registrar Nome</div>
+      <label for="nameInput">Nome a registrar</label>
+      <div class="stack">
+        <input id="nameInput" type="text" placeholder="ex.: Vinícius" class="grow" />
+        <button id="btnRegister" class="btn btn-primary" disabled>Registrar</button>
+      </div>
+      <div class="helper">Chama <code>registrarNome(string nm)</code>. Requer carteira conectada.</div>
+      <div id="txBox" class="result" style="margin-top:10px; display:none"></div>
+    </section>
+
+    <!-- CONSULTAR -->
+    <section class="card">
+      <div class="section-title">Consultar Nome por Endereço</div>
+      <label for="addrQuery">Endereço a consultar</label>
+      <div class="stack">
+        <input id="addrQuery" type="text" placeholder="0x1234...abcd" class="grow" />
+        <button id="btnQuery" class="btn" disabled>Consultar</button>
+      </div>
+      <div class="helper">Chama <code>consultarNome(address a)</code> (apenas leitura).</div>
+      <div id="readBox" class="result" style="margin-top:10px; display:none"></div>
+    </section>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+  <!-- ethers.js v6 (sem integrity para evitar bloqueio de SRI quando CDN atualiza) -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+
+  <script>
+  async function resolveToAddress(input){
+    const v = input.trim();
+
+    // 1) Endereço direto
+    if (ethers.isAddress(v)) return ethers.getAddress(v);
+
+    // 2) Hash de transação (0x + 64 hex) -> pega o remetente (from)
+    if (/^0x([A-Fa-f0-9]{64})$/.test(v)) {
+      if (!provider) throw new Error("Conecte a carteira antes.");
+      const tx = await provider.getTransaction(v);
+      if (!tx) throw new Error("Transação não encontrada.");
+      return ethers.getAddress(tx.from);
+    }
+
+    // 3) ENS (opcional)
+    if (v.endsWith(".eth")) {
+      if (!provider) throw new Error("Conecte a carteira antes.");
+      const addr = await provider.resolveName(v);
+      if (addr) return ethers.getAddress(addr);
+      throw new Error("Nome ENS não resolve para um endereço.");
+    }
+
+    throw new Error("Não é endereço, hash de tx nem ENS válido.");
+  }
+
+    // ======== ABI do contrato (a sua) ========
+    const ABI = [
+      {
+        "inputs":[{"internalType":"string","name":"nm","type":"string"}],
+        "name":"registrarNome",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+      },
+      {
+        "inputs":[{"internalType":"address","name":"a","type":"address"}],
+        "name":"consultarNome",
+        "outputs":[{"internalType":"string","name":"","type":"string"}],
+        "stateMutability":"view",
+        "type":"function"
+      }
+    ];
+
+    // ======== UI helpers ========
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => [...document.querySelectorAll(sel)];
+    const fmtAddr = (a) => a ? `${a.slice(0,6)}…${a.slice(-4)}` : '—';
+
+    const toasts = $("#toasts");
+    function toast(msg, type='ok', small=''){
+      const el = document.createElement('div');
+      el.className = `toast fade-in ${type === 'err' ? 'err' : 'ok'}`;
+      el.innerHTML = `<div>${msg}</div>${small ? `<small>${small}</small>` : ''}`;
+      toasts.appendChild(el);
+      setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(4px)'; }, 4200);
+      setTimeout(()=> el.remove(), 4600);
+    }
+
+    function setNet(statusText, ok){
+      $("#netLabel").textContent = statusText;
+      const dot = $("#netPill .dot");
+      dot.classList.toggle('red', !ok);
+    }
+
+    function show(el, yes=true){ el.style.display = yes ? '' : 'none'; }
+
+    // ======== State ========
+    let provider = null;
+    let signer   = null;
+    let account  = null;
+    let contract = null;
+
+    // ======== Elements ========
+    const btnConnect = $("#btnConnect");
+    const btnLoad    = $("#btnLoad");
+    const btnRegister= $("#btnRegister");
+    const btnQuery   = $("#btnQuery");
+
+    const contractAddress = $("#contractAddress");
+    const accountBox = $("#accountBox");
+    const balanceBox = $("#balanceBox");
+    const txBox = $("#txBox");
+    const readBox = $("#readBox");
+    const statusEl = $("#status");
+    const abiBox = $("#abiBox");
+    abiBox.textContent = JSON.stringify(ABI, null, 2);
+
+    // ======== Checks ========
+    function ensureEthereum(){
+      if(!window.ethereum){
+        toast("MetaMask não encontrada.", "err",
+          "Instale a extensão ou use um navegador compatível.");
+        statusEl.textContent = "MetaMask ausente";
+        return false;
+      }
+      return true;
+    }
+
+    async function connectWallet(){
+      if(!ensureEthereum()) return;
+      try{
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accs = await provider.send("eth_requestAccounts", []);
+        account = accs[0];
+        signer = await provider.getSigner();
+
+        const network = await provider.getNetwork();
+        setNet(`${network.name || 'rede'} (#${network.chainId})`, true);
+
+        accountBox.textContent = account;
+        const bal = await provider.getBalance(account);
+        balanceBox.textContent = ethers.formatEther(bal);
+
+        statusEl.textContent = "Carteira conectada. Informe o endereço do contrato e clique em Carregar.";
+        btnRegister.disabled = true;
+        btnQuery.disabled = true;
+        toast("Carteira conectada!");
+      }catch(e){
+        console.error(e);
+        toast("Falha ao conectar carteira.", "err", e.shortMessage || e.message);
+        setNet("desconectado", false);
+      }
+    }
+
+    async function loadContract(){
+      const addr = contractAddress.value.trim();
+      if(!addr || !ethers.isAddress(addr)){
+        toast("Endereço do contrato inválido.", "err");
+        return;
+      }
+      try{
+        // Para leitura podemos usar o provider; para transações, o signer
+        const runner = signer ?? provider;
+        if(!runner){
+          toast("Conecte a carteira primeiro.", "err");
+          return;
+        }
+        contract = new ethers.Contract(addr, ABI, runner);
+        // Teste rápido: chamar um método view com endereço zero (não-fatal)
+        try{ await contract.callStatic?.consultarNome?.(ethers.ZeroAddress); }catch{}
+
+        statusEl.textContent = `Contrato carregado: ${fmtAddr(addr)}`;
+        btnRegister.disabled = !signer; // precisa de signer para registrar
+        btnQuery.disabled = false;
+
+        toast("Contrato carregado.");
+      }catch(e){
+        console.error(e);
+        toast("Não foi possível inicializar o contrato.", "err", e.shortMessage || e.message);
+      }
+    }
+
+    async function doRegister(){
+      if(!contract || !signer){
+        toast("Contrato não carregado ou carteira desconectada.", "err");
+        return;
+      }
+      const nm = $("#nameInput").value.trim();
+      if(!nm){
+        toast("Informe um nome para registrar.", "err");
+        return;
+      }
+      try{
+        txBox.textContent = "Enviando transação…";
+        show(txBox, true);
+        const withSigner = contract.connect(signer);
+        const tx = await withSigner.registrarNome(nm);
+        txBox.textContent = `Tx enviada: ${tx.hash}\nAguardando confirmação…`;
+        const receipt = await tx.wait();
+        txBox.textContent = `Confirmada no bloco ${receipt.blockNumber}\nTx: ${tx.hash}`;
+        toast("Nome registrado com sucesso!");
+      }catch(e){
+        console.error(e);
+        show(txBox, true);
+        txBox.textContent = `Erro: ${e.shortMessage || e.message || e}`;
+        toast("Falha ao registrar.", "err");
+      }
+    }
+
+    async function doQuery(){
+        if(!contract){
+            toast("Contrato não carregado.", "err");
+            return;
+        }
+        const raw = $("#addrQuery").value.trim();
+
+        let addr;
+        try {
+            addr = await resolveToAddress(raw);
+        } catch(e){
+            toast("Endereço para consulta inválido.", "err", e.message || String(e));
+            return;
+        }
+
+        try{
+            const name = await contract.consultarNome(addr);
+            readBox.textContent = name ? `Nome: ${name}` : "Nenhum nome encontrado.";
+            show(readBox, true);
+        }catch(e){
+            console.error(e);
+            readBox.textContent = `Erro: ${e.shortMessage || e.message || e}`;
+            show(readBox, true);
+            toast("Falha ao consultar.", "err");
+        }
+    }
+
+    // ======== Events ========
+    btnConnect.addEventListener('click', connectWallet);
+    btnLoad.addEventListener('click', loadContract);
+    btnRegister.addEventListener('click', doRegister);
+    btnQuery.addEventListener('click', doQuery);
+
+    // Atualizações reativas da carteira / rede
+    if(window.ethereum){
+      window.ethereum.on?.('accountsChanged', async (accs)=>{
+        if(!accs?.length){ setNet("desconectado", false); accountBox.textContent = "—"; balanceBox.textContent="—"; return; }
+        account = accs[0];
+        accountBox.textContent = account;
+        if(provider){
+          const bal = await provider.getBalance(account);
+          balanceBox.textContent = ethers.formatEther(bal);
+        }
+        toast("Conta alterada.");
+      });
+      window.ethereum.on?.('chainChanged', async (_chainId)=>{
+        if(provider){
+          const network = await provider.getNetwork();
+          setNet(`${network.name || 'rede'} (#${network.chainId})`, true);
+          toast(`Rede alterada: #${network.chainId}`);
+        }
+      });
+    }
+
+    // Mensagem inicial
+    (function init(){
+      statusEl.textContent = "Conecte a carteira para começar.";
+      setNet("desconectado", false);
+    })();
+  </script>
+
+</body>
+</html>
