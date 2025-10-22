@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cofre Digital - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-vault"></i> Cofre Digital</h1>
+            <p>Sistema de cofre seguro na blockchain Arbitrum Sepolia</p>
+        </header>
+
+        <!-- Status da Conexão -->
+        <div class="connection-status" id="connectionStatus">
+            <i class="fas fa-circle"></i>
+            <span>Desconectado</span>
+        </div>
+
+        <!-- Seção de Conexão -->
+        <section class="card">
+            <h2><i class="fas fa-wallet"></i> Conexão com MetaMask</h2>
+            <div class="form-group">
+                <button id="connectBtn" class="btn btn-primary">
+                    <i class="fas fa-plug"></i> Conectar MetaMask
+                </button>
+                <div id="connectionInfo" class="info-box" style="display: none;">
+                    <p><strong>Conta:</strong> <span id="userAccount">-</span></p>
+                    <p><strong>Dono do Cofre:</strong> <span id="ownerAddress">-</span></p>
+                    <p><strong>Rede:</strong> Arbitrum Sepolia</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Saldo do Cofre -->
+        <section class="card">
+            <h2><i class="fas fa-coins"></i> Saldo do Cofre</h2>
+            <div class="balance-display">
+                <div class="balance-amount" id="balanceAmount">0.00</div>
+                <div class="balance-label">ETH</div>
+            </div>
+            <button id="checkBalanceBtn" class="btn btn-info">
+                <i class="fas fa-refresh"></i> Verificar Saldo
+            </button>
+        </section>
+
+        <!-- Depositar -->
+        <section class="card">
+            <h2><i class="fas fa-arrow-down"></i> Depositar no Cofre</h2>
+            <div class="form-group">
+                <label for="depositAmount">Valor a depositar (ETH):</label>
+                <input type="number" id="depositAmount" placeholder="0.01" step="0.001" min="0">
+                <button id="depositBtn" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Depositar
+                </button>
+            </div>
+        </section>
+
+        <!-- Transferir -->
+        <section class="card">
+            <h2><i class="fas fa-arrow-up"></i> Transferir do Cofre</h2>
+            <div class="form-group">
+                <label for="recipientAddress">Endereço do destinatário:</label>
+                <input type="text" id="recipientAddress" placeholder="0x...">
+                <label for="transferAmount">Valor a transferir (ETH):</label>
+                <input type="number" id="transferAmount" placeholder="0.01" step="0.001" min="0">
+                <button id="transferBtn" class="btn btn-warning">
+                    <i class="fas fa-paper-plane"></i> Transferir
+                </button>
+            </div>
+        </section>
+
+        <!-- Sacar Tudo -->
+        <section class="card">
+            <h2><i class="fas fa-hand-holding-usd"></i> Sacar Tudo</h2>
+            <div class="form-group">
+                <p><strong>Atenção:</strong> Saca todo o saldo deixando 0.0001 ETH no cofre (apenas o dono).</p>
+                <button id="withdrawBtn" class="btn btn-danger">
+                    <i class="fas fa-money-bill-wave"></i> Sacar Tudo
+                </button>
+            </div>
+        </section>
+
+        <!-- Informações do Contrato -->
+        <section class="card">
+            <h2><i class="fas fa-info-circle"></i> Informações do Contrato</h2>
+            <div class="contract-info">
+                <div class="info-item">
+                    <strong>Endereço:</strong>
+                    <span>0x249d4630d022820181421B07259983C9d6Fd0a11</span>
+                </div>
+                <div class="info-item">
+                    <strong>Rede:</strong>
+                    <span>Arbitrum Sepolia</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Cofre Digital - Sistema de Cofre Blockchain</p>
+            <p>Desenvolvido para Arbitrum Sepolia Testnet</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
