@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DApp - Registro de Nomes</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cubes"></i> DApp Registro de Nomes</h1>
+            <p>Interaja com contratos inteligentes na blockchain</p>
+        </div>
+        
+        <div class="content">
+            <!-- Seção de Conexão da Wallet -->
+            <div class="wallet-section" id="walletSection">
+                <h2><i class="fas fa-wallet"></i> Status da Carteira</h2>
+                <p id="walletStatus">Conecte sua carteira para começar</p>
+                <button class="btn" id="connectBtn">
+                    <i class="fas fa-plug"></i>
+                    Conectar MetaMask
+                </button>
+                <div class="status" id="connectionStatus"></div>
+            </div>
+
+            <!-- Informações da Rede -->
+            <div class="network-info" id="networkInfo" style="display: none;">
+                <i class="fas fa-network-wired"></i>
+                Conectado à rede: <span id="networkName"></span> | 
+                Conta: <span id="accountAddress"></span>
+            </div>
+
+            <!-- Seção de Registro de Nome -->
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-user-plus"></i>
+                    Registrar Nome
+                </h3>
+                <div class="input-group">
+                    <label for="nomeInput">Nome a ser registrado:</label>
+                    <input type="text" id="nomeInput" placeholder="Digite seu nome" />
+                </div>
+                <button class="btn" id="registrarBtn">
+                    <i class="fas fa-save"></i>
+                    Registrar Nome
+                </button>
+                <div class="status" id="registerStatus"></div>
+            </div>
+
+            <!-- Seção de Consulta de Nome -->
+            <div class="section">
+                <h3 class="section-title">
+                    <i class="fas fa-search"></i>
+                    Consultar Nome por Endereço
+                </h3>
+                <div class="input-group">
+                    <label for="addressInput">Endereço da carteira:</label>
+                    <input type="text" id="addressInput" placeholder="0x..." />
+                </div>
+                <button class="btn" id="consultarBtn">
+                    <i class="fas fa-search"></i>
+                    Consultar Nome
+                </button>
+                <div class="status" id="consultStatus"></div>
+                <div class="result" id="consultResult">
+                    <div class="result-label">Nome encontrado:</div>
+                    <div class="result-value" id="nomeResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

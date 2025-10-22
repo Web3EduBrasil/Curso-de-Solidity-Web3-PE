@@ -1,0 +1,70 @@
+{
+  "contract": {
+    "address": "0x1c37009124E4ba59daF147E9b11A9aCC5A1530f1",
+    "network": "arbitrum-sepolia",
+    "abi": [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "a",
+            "type": "address"
+          }
+        ],
+        "name": "consultarNome",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "nm",
+            "type": "string"
+          }
+        ],
+        "name": "registrarNome",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
+  "ui": {
+    "theme": {
+      "primary": "#4facfe",
+      "secondary": "#00f2fe",
+      "success": "#4ecdc4",
+      "error": "#f5576c",
+      "warning": "#f093fb",
+      "info": "#d1ecf1"
+    },
+    "maxNameLength": 50,
+    "autoHideSuccess": 5000
+  },
+  "networks": {
+    "1": "Ethereum Mainnet",
+    "3": "Ropsten Testnet",
+    "4": "Rinkeby Testnet",
+    "5": "Goerli Testnet",
+    "42": "Kovan Testnet",
+    "137": "Polygon Mainnet",
+    "80001": "Mumbai Testnet",
+    "56": "BSC Mainnet",
+    "97": "BSC Testnet",
+    "11155111": "Sepolia Testnet",
+    "421614": "Arbitrum Sepolia Testnet"
+  }
+}
