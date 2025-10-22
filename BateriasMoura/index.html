@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Baterias Moura - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <i class="fas fa-battery-three-quarters"></i>
+                <div class="brand-text">
+                    <h1>Baterias Moura</h1>
+                    <p>Sistema de Rastreamento Blockchain</p>
+                </div>
+            </div>
+            <div class="network-info">
+                <i class="fas fa-network-wired"></i>
+                <span>Arbitrum Sepolia</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Painel de Conexão -->
+        <section class="connection-panel">
+            <div class="panel-header">
+                <i class="fas fa-wallet"></i>
+                <h2>Conexão Blockchain</h2>
+            </div>
+            <div id="connectionStatus" class="connection-status">
+                <div class="status-indicator disconnected">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Carteira não conectada</span>
+                </div>
+            </div>
+            <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">
+                <i class="fas fa-plug"></i>
+                Conectar MetaMask
+            </button>
+        </section>
+
+        <!-- Dashboard de Informações -->
+        <section class="dashboard">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Contrato</h3>
+                    <p class="contract-address">0x1c9a4a646cc22E895842B58c307271A21FC81303</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Proprietário</h3>
+                    <p id="donoAddress">Carregando...</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-battery-half"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Total de Baterias</h3>
+                    <p id="totalBaterias" class="counter">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Cadastro -->
+        <section class="battery-form-section">
+            <div class="section-header">
+                <i class="fas fa-plus-circle"></i>
+                <h2>Cadastrar Nova Bateria</h2>
+            </div>
+            
+            <form id="cadastrarForm" class="battery-form">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="tipo">
+                            <i class="fas fa-tag"></i>
+                            Tipo da Bateria
+                        </label>
+                        <select id="tipo" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Automotiva">🚗 Automotiva</option>
+                            <option value="Estacionária">🏢 Estacionária</option>
+                            <option value="Tracionária">🚚 Tracionária</option>
+                            <option value="Solar">☀️ Solar</option>
+                            <option value="NoBreak">💻 NoBreak</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="uso">
+                            <i class="fas fa-tools"></i>
+                            Uso/Aplicação
+                        </label>
+                        <input type="text" id="uso" placeholder="Ex: Carro de passeio, Empilhadeira..." required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="nrSerie">
+                            <i class="fas fa-barcode"></i>
+                            Número de Série
+                        </label>
+                        <input type="text" id="nrSerie" placeholder="Ex: MOU2024001234" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="dataProd">
+                            <i class="fas fa-calendar-alt"></i>
+                            Data de Produção
+                        </label>
+                        <input type="date" id="dataProd" required>
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="lote">
+                            <i class="fas fa-boxes"></i>
+                            Lote de Produção
+                        </label>
+                        <input type="text" id="lote" placeholder="Ex: LT2024A001" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        Cadastrar Bateria
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Seção de Busca -->
+        <section class="search-section">
+            <div class="section-header">
+                <i class="fas fa-search"></i>
+                <h2>Buscar Bateria</h2>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-input-group">
+                    <input type="number" id="searchId" placeholder="Digite o ID da bateria (0, 1, 2...)" min="0">
+                    <button class="btn btn-info" onclick="buscarBateria()">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                </div>
+                <div id="searchResult" class="search-results"></div>
+            </div>
+        </section>
+
+        <!-- Lista de Baterias -->
+        <section class="battery-list-section">
+            <div class="section-header">
+                <i class="fas fa-list"></i>
+                <h2>Lista de Baterias</h2>
+                <button class="btn btn-secondary" onclick="listarBaterias()">
+                    <i class="fas fa-sync-alt"></i>
+                    Atualizar
+                </button>
+            </div>
+            
+            <div id="listaDiv" class="battery-grid"></div>
+        </section>
+
+        <!-- Seção de Administração -->
+        <section class="admin-section">
+            <div class="section-header">
+                <i class="fas fa-user-shield"></i>
+                <h2>Administração</h2>
+            </div>
+            
+            <div class="admin-panel">
+                <div class="admin-field">
+                    <label for="novoDonoAddress">
+                        <i class="fas fa-exchange-alt"></i>
+                        Transferir Propriedade
+                    </label>
+                    <div class="transfer-group">
+                        <input type="text" id="novoDonoAddress" placeholder="Endereço do novo proprietário (0x...)">
+                        <button class="btn btn-warning" onclick="transferirDono()">
+                            <i class="fas fa-arrow-right"></i>
+                            Transferir
+                        </button>
+                    </div>
+                    <p class="help-text">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Apenas o proprietário atual pode transferir a propriedade do sistema.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-backdrop" onclick="fecharModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-edit"></i>
+                    Editar Bateria
+                </h3>
+                <button class="modal-close" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="editForm" class="edit-form">
+                    <input type="hidden" id="editId">
+                    
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="editTipo">Tipo</label>
+                            <select id="editTipo" required>
+                                <option value="Automotiva">🚗 Automotiva</option>
+                                <option value="Estacionária">🏢 Estacionária</option>
+                                <option value="Tracionária">🚚 Tracionária</option>
+                                <option value="Solar">☀️ Solar</option>
+                                <option value="NoBreak">💻 NoBreak</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="editUso">Uso</label>
+                            <input type="text" id="editUso" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="editNrSerie">Número de Série</label>
+                            <input type="text" id="editNrSerie" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="editDataProd">Data de Produção</label>
+                            <input type="date" id="editDataProd" required>
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="editLote">Lote</label>
+                            <input type="text" id="editLote" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit" form="editForm" class="btn btn-success">
+                    <i class="fas fa-save"></i>
+                    Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

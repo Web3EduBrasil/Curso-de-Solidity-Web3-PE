@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy + Logic Contract</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Proxy + Logic Contract</h1>
+            <p>Gerenciamento de Proxy e Execução de Funções</p>
+        </header>
+
+        <!-- Conexão -->
+        <section class="card">
+            <h2>Conexão</h2>
+            <button id="connectBtn" class="btn">Conectar MetaMask</button>
+            <div id="connectionInfo" style="display: none;">
+                <p><strong>Conta:</strong> <span id="userAccount"></span></p>
+                <p><strong>Admin:</strong> <span id="adminAddress"></span></p>
+            </div>
+        </section>
+
+        <!-- Status Atual -->
+        <section class="card">
+            <h2>Status Atual</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <label>Número Atual:</label>
+                    <span id="currentNumber">-</span>
+                    <button id="refreshBtn" class="btn-sm">Atualizar</button>
+                </div>
+                <div class="status-item">
+                    <label>Versão:</label>
+                    <span id="currentVersion">-</span>
+                </div>
+                <div class="status-item">
+                    <label>Implementação:</label>
+                    <span id="currentImpl">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Função Incrementar -->
+        <section class="card">
+            <h2>Função da Implementação</h2>
+            <button id="incrementBtn" class="btn btn-primary">Incrementar Número</button>
+        </section>
+
+        <!-- Alterar Implementação -->
+        <section class="card">
+            <h2>Alterar Implementação</h2>
+            <div class="form-group">
+                <input type="text" id="newImplementation" placeholder="Novo endereço de implementação">
+                <button id="updateBtn" class="btn btn-warning">Alterar Implementação</button>
+            </div>
+        </section>
+
+        <!-- Endereços Úteis -->
+        <section class="card">
+            <h2>Endereços Úteis</h2>
+            <div class="addresses">
+                <p><strong>Proxy:</strong> 0x6c85B88A168aa7aEE142f0E34dBa8679Ca9Fbc37</p>
+                <p><strong>LogicV1:</strong> [Deploy LogicV1 e cole aqui]</p>
+                <p><strong>LogicV2:</strong> [Deploy LogicV2 e cole aqui]</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
