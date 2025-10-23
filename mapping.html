@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Nomes - Smart Contract</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #3B3B3B; /* Cor de fundo escura, como pedra */
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAApklEQVRYo+3VMQoAIAgE0Pz/v3QoWhgG7aA4027d7E5a8wYAAAAAAAAAAAAAAAAA8G2zNz8/n398Z9qCiJikA2ZkQ3cyotv2zGvJvP1iRPSb45k/eYcZ+SP2yjjvO2Yk/Vljfpn9dYyIznmPmfm/mdk/ZpQZ2R+tiMj+Y0Zk/8kPMyL7z7D8TAbYx0/M580X8/kMAAAAAElFTkSuQmCC'); /* Textura de pedra sutil */
+            color: #FFFFFF;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            image-rendering: pixelated; /* Garante que as imagens de fundo fiquem pixeladas */
+        }
+        .container {
+            background-color: #C6C6C6; /* Cinza claro, como a UI do Minecraft */
+            padding: 20px;
+            border: 4px solid #585858;
+            box-shadow: 0 0 0 4px #000000;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #000000;
+            text-shadow: 2px 2px #AAAAAA;
+            margin-bottom: 25px;
+        }
+        .card {
+            background-color: #8B8B8B;
+            border: 4px solid #585858;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 0 4px #000000;
+        }
+        p {
+            color: #000000;
+            text-shadow: 1px 1px #AAAAAA;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            background-color: #7D7D7D;
+            color: #DDDDDD;
+            border: 2px solid #000000;
+            box-shadow: inset -2px -4px 0px 0px #585858, inset 2px 2px 0px 0px #A0A0A0;
+            padding: 12px 18px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            text-shadow: 2px 2px #3B3B3B;
+        }
+        button:hover:not(:disabled) {
+            background-color: #878787;
+            color: #FFFFAF; /* Cor amarela ao passar o mouse */
+        }
+        button:active:not(:disabled) {
+            box-shadow: inset 2px 2px 0px 0px #585858, inset -2px -4px 0px 0px #A0A0A0;
+            padding-top: 14px;
+            padding-bottom: 10px;
+        }
+        button:disabled {
+            background-color: #505050;
+            color: #9E9E9E;
+            cursor: not-allowed;
+            text-shadow: 2px 2px #2A2A2A;
+            box-shadow: inset -2px -4px 0px 0px #3B3B3B, inset 2px 2px 0px 0px #7D7D7D;
+        }
+        input[type="text"] {
+            font-family: 'Press Start 2P', cursive;
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            background-color: #000000;
+            border: 2px solid #585858;
+            color: #FFFFFF;
+        }
+        #status, #accountInfo, #queryResult {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            word-wrap: break-word;
+            padding: 10px;
+            text-shadow: 2px 2px #000;
+        }
+        #accountInfo { color: #55FF55; } /* Verde Minecraft */
+        #queryResult { color: #55FFFF; } /* Ciano Minecraft */
+        #status { color: #FF5555; } /* Vermelho Minecraft */
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Exemplo de Mapping</h1>
+
+        <div class="card">
+            <h2>Conexão com a Carteira</h2>
+            <button id="connectButton">Conectar Carteira</button>
+            <div id="accountInfo" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>1. Registrar Meu Nome</h2>
+            <p>Associe um nome ao seu endereço conectado.</p>
+            <input type="text" id="nameInput" placeholder="Digite seu nome" disabled>
+            <button id="registerButton" disabled>Registrar</button>
+        </div>
+
+        <div class="card">
+            <h2>2. Consultar Nome por Endereço</h2>
+            <p>Verifique o nome associado a qualquer endereço Ethereum.</p>
+            <input type="text" id="addressInput" placeholder="Cole o endereço aqui" disabled>
+            <button id="queryButton" disabled>Consultar</button>
+            <div id="queryResult" style="display:none;"></div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÕES DO CONTRATO ---
+        const contractAddress = "0x553aC354810A6549c35a353BfA29caAC025C33BA";
+        const contractABI = [
+            { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+            { "inputs": [{ "internalType": "address", "name": "a", "type": "address" }], "name": "consultarNome", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [{ "internalType": "string", "name": "nm", "type": "string" }], "name": "registrarNome", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+        ];
+
+        // --- VARIÁVEIS GLOBAIS ---
+        let provider, signer, contract;
+
+        // --- ELEMENTOS DO DOM ---
+        const connectButton = document.getElementById('connectButton');
+        const registerButton = document.getElementById('registerButton');
+        const queryButton = document.getElementById('queryButton');
+        const nameInput = document.getElementById('nameInput');
+        const addressInput = document.getElementById('addressInput');
+        const accountInfo = document.getElementById('accountInfo');
+        const queryResult = document.getElementById('queryResult');
+        const status = document.getElementById('status');
+
+        // --- FUNÇÕES ---
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                return showError("MetaMask não encontrado! Por favor, instale a extensão.");
+            }
+            try {
+                showStatus("Conectando...");
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+                
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                accountInfo.innerText = `Conectado: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                accountInfo.style.display = 'block';
+                connectButton.innerText = 'Carteira Conectada';
+                connectButton.disabled = true;
+
+                // Habilita os campos
+                nameInput.disabled = false;
+                registerButton.disabled = false;
+                addressInput.disabled = false;
+                queryButton.disabled = false;
+                clearStatus();
+            } catch (error) {
+                console.error("Erro ao conectar carteira:", error);
+                showError("Falha ao conectar a carteira.");
+            }
+        }
+
+        async function registerName() {
+            const name = nameInput.value;
+            if (!name) return showError("Por favor, digite um nome para registrar.");
+            
+            try {
+                showStatus("Aguardando confirmação na MetaMask...");
+                const tx = await contract.registrarNome(name);
+                showStatus("Processando sua transação na blockchain...");
+                await tx.wait();
+                showSuccess(`Nome "${name}" registrado com sucesso!`);
+                nameInput.value = '';
+            } catch (error) {
+                console.error("Erro ao registrar nome:", error);
+                showError("Ocorreu um erro ao registrar o nome.");
+            }
+        }
+
+        async function queryName() {
+            const addressToQuery = addressInput.value;
+            if (!ethers.utils.isAddress(addressToQuery)) {
+                return showError("Endereço inválido. Por favor, verifique.");
+            }
+            try {
+                showStatus("Consultando...");
+                const name = await contract.consultarNome(addressToQuery);
+                if (name) {
+                    showResult(`Nome encontrado: ${name}`);
+                } else {
+                    showResult("Nenhum nome registrado para este endereço.");
+                }
+                clearStatus();
+            } catch (error) {
+                console.error("Erro ao consultar nome:", error);
+                showError("Ocorreu um erro ao fazer a consulta.");
+            }
+        }
+
+        // Funções auxiliares de status
+        function showStatus(message) {
+            status.style.color = '#FFAA00'; // Laranja
+            status.innerText = message;
+        }
+        function showSuccess(message) {
+            status.style.color = '#55FF55'; // Verde
+            status.innerText = message;
+        }
+        function showError(message) {
+            status.style.color = '#FF5555'; // Vermelho
+            status.innerText = message;
+        }
+        function clearStatus() {
+            setTimeout(() => { status.innerText = '' }, 5000); // Limpa a mensagem após 5 segundos
+        }
+        function showResult(message) {
+            queryResult.innerText = message;
+            queryResult.style.display = 'block';
+        }
+
+        // --- EVENT LISTENERS ---
+        connectButton.addEventListener('click', connectWallet);
+        registerButton.addEventListener('click', registerName);
+        queryButton.addEventListener('click', queryName);
+
+    </script>
+</body>
+</html>
