@@ -1,0 +1,135 @@
+/* Estilos globais para o corpo da página */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    /* Fundo cinza claro */
+    color: #333;
+    /* Texto cinza escuro */
+    margin: 20px;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Estilo para os títulos principais */
+h2,
+h3 {
+    color: #1a4f78;
+    /* Azul escuro */
+    border-bottom: 2px solid #a8cddf;
+    /* Linha divisória azul claro */
+    padding-bottom: 5px;
+    margin-top: 30px;
+}
+
+/* Estilo geral para formulários e seções de conteúdo */
+#cadastroForm,
+#editarSeção,
+#listaBaterias {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+/* Estilo para labels (rótulos) */
+label {
+    display: block;
+    /* Garante que cada label ocupe uma linha */
+    margin-top: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Estilo para campos de entrada de texto e número */
+input[type="text"],
+input[type="number"] {
+    width: 95%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* Garante que o padding não aumente a largura total */
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #4CAF50;
+    /* Verde ao focar */
+    outline: none;
+}
+
+/* Estilo para botões */
+button {
+    background-color: #4CAF50;
+    /* Verde */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-right: 10px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+    background-color: #45a049;
+    /* Verde mais escuro ao passar o mouse */
+}
+
+button:active {
+    transform: scale(0.98);
+    /* Efeito de clique */
+}
+
+/* Estilo específico para o botão de Listar Baterias */
+#listarBtn {
+    background-color: #008CBA;
+    /* Azul */
+}
+
+#listarBtn:hover {
+    background-color: #007bb5;
+}
+
+/* Estilo específico para o botão de Buscar Dados */
+#buscarBtn {
+    background-color: #f4a261;
+    /* Laranja */
+}
+
+#buscarBtn:hover {
+    background-color: #e78c43;
+}
+
+/* Estilo para a lista de baterias */
+#listaBaterias>div {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+#listaBaterias b {
+    color: #1a4f78;
+    font-size: 1.1em;
+}
+
+/* Estilo para a linha horizontal dentro da lista */
+#listaBaterias hr {
+    border: 0;
+    border-top: 1px dashed #ccc;
+    margin: 15px 0;
+}
+
+/* Estilo para o span que mostra o número da bateria na edição */
+#numBateria {
+    color: #E74C3C;
+    /* Vermelho para destaque */
+    font-weight: bold;
+}

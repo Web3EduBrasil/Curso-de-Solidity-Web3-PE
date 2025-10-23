@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Interface Bateria</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+
+<body>
+    <h2>Cadastro de Bateria</h2>
+    <form id="cadastroForm">
+        <label>Tipo:</label><br>
+        <input type="text" id="tipo" required /><br>
+        <label>Uso:</label><br>
+        <input type="text" id="uso" required /><br>
+        <label>Número de Série:</label><br>
+        <input type="text" id="num_serie" required /><br>
+        <label>Data de Produção:</label><br>
+        <input type="text" id="data_prod" required /><br>
+        <label>Lote:</label><br>
+        <input type="text" id="lote" required /><br><br>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Listar Baterias</h2>
+    <button id="listarBtn">Listar Baterias</button><br><br>
+    <div id="listaBaterias"></div>
+
+    <h2>Editar Bateria</h2>
+    <label>Índice da Bateria:</label>
+    <input type="number" id="editIndex" min="0" />
+    <button id="buscarBtn">Buscar Dados</button><br><br>
+
+    <div id="editarSeção" style="display:none;">
+        <h3>Dados da bateria nº <span id="numBateria"></span></h3>
+        <form id="editarForm">
+            <label>Tipo:</label><br>
+            <input type="text" id="editTipo" /><br>
+            <label>Uso:</label><br>
+            <input type="text" id="editUso" /><br>
+            <label>Número de Série:</label><br>
+            <input type="text" id="editNumSerie" /><br>
+            <label>Data de Produção:</label><br>
+            <input type="text" id="editDataProd" /><br>
+            <label>Lote:</label><br>
+            <input type="text" id="editLote" /><br><br>
+            <button type="button" id="atualizarBtn">Atualizar Dados</button>
+        </form>
+    </div>
+
+    <script>
+        const contractAddress = '0xBf196f271D3e4507B53faAb9860a9d35116e8669'; // insira o endereço do contrato
+        const abi = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_num_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_data_prod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "cadastrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_data_prod",
+				"type": "string"
+			}
+		],
+		"name": "setDataProdBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "setLoteBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_num_serie",
+				"type": "string"
+			}
+		],
+		"name": "setNumSerieBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			}
+		],
+		"name": "setTipoBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_uso",
+				"type": "string"
+			}
+		],
+		"name": "setUsoBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "baterias",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "num_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "data_prod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getDataProdBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getLoteBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getNumSerieBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getTipoBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getUsoBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "listarBaterias",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "num_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "data_prod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct Bateria.Cadastro[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const contract = new web3.eth.Contract(abi, contractAddress);
+                const accounts = await web3.eth.getAccounts();
+
+                // Cadastro de bateria
+                document.getElementById('cadastroForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const tipo = document.getElementById('tipo').value;
+                    const uso = document.getElementById('uso').value;
+                    const numSerie = document.getElementById('num_serie').value;
+                    const dataProd = document.getElementById('data_prod').value;
+                    const lote = document.getElementById('lote').value;
+
+                    try {
+                        await contract.methods.cadastrarBateria(tipo, uso, numSerie, dataProd, lote)
+                            .send({ from: accounts[0] });
+                        alert('Bateria cadastrada com sucesso!');
+                    } catch (err) {
+                        console.error(err);
+                        alert('Erro ao cadastrar bateria.');
+                    }
+                });
+
+                // Listar baterias
+                document.getElementById('listarBtn').addEventListener('click', async () => {
+                    try {
+                        const baterias = await contract.methods.listarBaterias().call();
+                        const container = document.getElementById('listaBaterias');
+                        container.innerHTML = '';
+
+                        baterias.forEach((b, index) => {
+                            const div = document.createElement('div');
+                            div.innerHTML = `
+            <b>Bateria ${index}:</b><br>
+            Tipo: ${b.tipo}<br>
+            Uso: ${b.uso}<br>
+            Número de Série: ${b.num_serie}<br>
+            Data de Produção: ${b.data_prod}<br>
+            Lote: ${b.lote}<br>
+            <button onclick="mostrarDados(${index})">Editar</button><hr>
+          `;
+                            container.appendChild(div);
+                        });
+                    } catch (err) {
+                        console.error(err);
+                        alert('Erro ao listar baterias.');
+                    }
+                });
+
+                // Buscar dados para editar
+                document.getElementById('buscarBtn').addEventListener('click', async () => {
+                    const index = document.getElementById('editIndex').value;
+                    if (index === '') {
+                        alert('Informe o índice da bateria.');
+                        return;
+                    }
+                    try {
+                        // Pega os atributos
+                        const tipo = await contract.methods.getTipoBateria(index).call();
+                        const uso = await contract.methods.getUsoBateria(index).call();
+                        const numSerie = await contract.methods.getNumSerieBateria(index).call();
+                        const dataProd = await contract.methods.getDataProdBateria(index).call();
+                        const lote = await contract.methods.getLoteBateria(index).call();
+
+                        // Exibe na seção de edição
+                        document.getElementById('editarSeção').style.display = 'block';
+                        document.getElementById('numBateria').innerText = index;
+                        document.getElementById('editTipo').value = tipo;
+                        document.getElementById('editUso').value = uso;
+                        document.getElementById('editNumSerie').value = numSerie;
+                        document.getElementById('editDataProd').value = dataProd;
+                        document.getElementById('editLote').value = lote;
+                    } catch (err) {
+                        console.error(err);
+                        alert('Erro ao buscar dados.');
+                    }
+                });
+
+                // Mostrar dados ao clicar no botão "Editar"
+                window.mostrarDados = async (index) => {
+                    try {
+                        const tipo = await contract.methods.getTipoBateria(index).call();
+                        const uso = await contract.methods.getUsoBateria(index).call();
+                        const numSerie = await contract.methods.getNumSerieBateria(index).call();
+                        const dataProd = await contract.methods.getDataProdBateria(index).call();
+                        const lote = await contract.methods.getLoteBateria(index).call();
+
+                        document.getElementById('editIndex').value = index;
+                        document.getElementById('editarSeção').style.display = 'block';
+                        document.getElementById('numBateria').innerText = index;
+                        document.getElementById('editTipo').value = tipo;
+                        document.getElementById('editUso').value = uso;
+                        document.getElementById('editNumSerie').value = numSerie;
+                        document.getElementById('editDataProd').value = dataProd;
+                        document.getElementById('editLote').value = lote;
+                    } catch (err) {
+                        console.error(err);
+                        alert('Erro ao carregar dados.');
+                    }
+                };
+
+                // Atualizar atributos
+                document.getElementById('atualizarBtn').addEventListener('click', async () => {
+                    const index = document.getElementById('editIndex').value;
+                    const tipo = document.getElementById('editTipo').value;
+                    const uso = document.getElementById('editUso').value;
+                    const numSerie = document.getElementById('editNumSerie').value;
+                    const dataProd = document.getElementById('editDataProd').value;
+                    const lote = document.getElementById('editLote').value;
+
+                    try {
+                        await contract.methods.setTipoBateria(index, tipo).send({ from: accounts[0] });
+                        await contract.methods.setUsoBateria(index, uso).send({ from: accounts[0] });
+                        await contract.methods.setNumSerieBateria(index, numSerie).send({ from: accounts[0] });
+                        await contract.methods.setDataProdBateria(index, dataProd).send({ from: accounts[0] });
+                        await contract.methods.setLoteBateria(index, lote).send({ from: accounts[0] });
+                        alert('Dados atualizados!');
+                        // Opcional: atualizar visualização
+                        mostrarDados(index);
+                    } catch (err) {
+                        console.error(err);
+                        alert('Erro ao atualizar dados.');
+                    }
+                });
+
+            } else {
+                alert('MetaMask ou outro wallet não encontrado.');
+            }
+        });
+    </script>
+</body>
+
+</html>
