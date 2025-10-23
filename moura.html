@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Baterias Moura - DApp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
+    <style>
+        :root {
+            --moura-blue: #0033a0;
+            --moura-yellow: #ffcb05;
+            --background-light: #f4f7fa;
+            --text-dark: #333;
+            --text-light: #ffffff;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            padding: 2rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--text-light);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            overflow: hidden; /* Garante que o header arredondado funcione */
+        }
+
+        header {
+            background-color: var(--moura-blue);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem;
+            border-bottom: 6px solid var(--moura-yellow);
+        }
+
+        header h1 {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 2.8rem;
+            font-weight: 900;
+        }
+
+        header p {
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+        }
+        
+        #connect-section {
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        
+        .main-content {
+            padding: 2rem;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--moura-yellow);
+            color: var(--moura-blue);
+            box-shadow: 0 4px 15px rgba(255, 203, 5, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: #e6b804;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 203, 5, 0.5);
+        }
+
+        .btn-secondary {
+            background-color: var(--moura-blue);
+            color: var(--text-light);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #002275;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: var(--text-light);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        #wallet-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .dapp-content {
+            display: none; /* Oculto até conectar */
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #6c757d;
+            border-bottom: 4px solid transparent;
+            margin-bottom: -2px; /* Alinha com a borda principal */
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button:hover {
+            color: var(--moura-blue);
+        }
+
+        .tab-button.active {
+            color: var(--moura-blue);
+            font-weight: bold;
+            border-bottom: 4px solid var(--moura-yellow);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--moura-blue);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        #battery-list, #consulta-resultado { margin-top: 1.5rem; }
+
+        .battery-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .battery-card-header {
+            background-color: var(--moura-blue);
+            color: var(--text-light);
+            padding: 0.75rem 1.25rem;
+        }
+
+        .battery-card-header strong {
+            color: var(--moura-yellow);
+            font-size: 1.1rem;
+        }
+        
+        .battery-card-body {
+            padding: 1.25rem;
+        }
+        
+        .battery-card-body p {
+            margin: 0.6rem 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .battery-card-body strong { color: var(--moura-blue); }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+        }
+
+        #status-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            font-weight: bold;
+        }
+
+        .status-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-info { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Registro de Baterias Moura</h1>
+            <p>Gerencie o registro de baterias defeituosas na blockchain.</p>
+        </header>
+
+        <section id="connect-section">
+            <button id="connectButton" class="btn btn-primary">Conectar com MetaMask</button>
+            <div id="wallet-status">Status: Não conectado</div>
+        </section>
+
+        <main id="dappContent" class="dapp-content main-content">
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'listar')">Listar Baterias</button>
+                <button class="tab-button" onclick="openTab(event, 'registrar')">Registrar</button>
+                <button class="tab-button" onclick="openTab(event, 'consultar')">Consultar</button>
+                <button class="tab-button" onclick="openTab(event, 'remover')">Remover</button>
+            </div>
+
+            <div id="listar" class="tab-content active">
+                <h2>Baterias Defeituosas Registradas</h2>
+                <button id="refreshListButton" class="btn btn-secondary">Atualizar Lista</button>
+                <div id="battery-list">
+                    <p class="empty-state">Nenhuma bateria registrada. Clique em "Atualizar Lista" para buscar.</p>
+                </div>
+            </div>
+
+            <div id="registrar" class="tab-content">
+                <h2>Registrar Nova Bateria Defeituosa</h2>
+                <form id="registerForm">
+                    <div class="form-group"> <label for="tipo">Tipo da Bateria (Ex: AGM, EFB)</label> <input type="text" id="tipo" required> </div>
+                    <div class="form-group"> <label for="uso">Tipo de Uso</label> <select id="uso" required> <option value="0">Automotivo</option> <option value="1">Náutico</option> <option value="2">Industrial</option> <option value="3">Estacionária</option> <option value="4">Acumulador</option> </select> </div>
+                    <div class="form-group"> <label for="serialNumber">Número de Série</label> <input type="text" id="serialNumber" required> </div>
+                    <div class="form-group"> <label for="dataProducao">Data de Produção</label> <input type="date" id="dataProducao" required> </div>
+                    <div class="form-group"> <label for="lote">Lote de Fabricação</label> <input type="text" id="lote" required> </div>
+                    <button type="submit" class="btn btn-primary">Registrar Bateria</button>
+                </form>
+            </div>
+
+            <div id="consultar" class="tab-content">
+                <h2>Consultar Bateria por Número de Série</h2>
+                <form id="consultarForm">
+                    <div class="form-group"> <label for="consultarSerialNumber">Número de Série</label> <input type="text" id="consultarSerialNumber" required> </div>
+                    <button type="submit" class="btn btn-secondary">Consultar</button>
+                </form>
+                <div id="consulta-resultado"></div>
+            </div>
+
+            <div id="remover" class="tab-content">
+                <h2>Remover Bateria por Número de Série</h2>
+                <form id="removeForm">
+                    <div class="form-group"> <label for="removeSerialNumber">Número de Série da Bateria</label> <input type="text" id="removeSerialNumber" required> </div>
+                    <button type="submit" class="btn btn-danger">Remover Bateria</button>
+                </form>
+            </div>
+
+            <div id="status-message"></div>
+        </main>
+    </div>
+
+    <script>
+        // --- Configuração do Contrato ---
+        // Endereço do novo contrato PÚBLICO implantado
+        const contractAddress = "0xf7C243720606A60E727dF72A58b68DF55D16f36E";
+        
+        // ABI atualizada para o contrato PÚBLICO
+        const contractABI = [
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"string","name":"serialNumber","type":"string"},{"indexed":false,"internalType":"string","name":"tipo","type":"string"},{"indexed":false,"internalType":"enum RegistroBateriasMoura_Public.TipoUso","name":"uso","type":"uint8"}],"name":"BateriaRegistrada","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"idRemovido","type":"uint256"},{"indexed":false,"internalType":"string","name":"serialNumber","type":"string"}],"name":"BateriaRemovida","type":"event"},{"inputs":[{"internalType":"string","name":"_serialNumber","type":"string"}],"name":"getBateriaPorSerial","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"tipo","type":"string"},{"internalType":"enum RegistroBateriasMoura_Public.TipoUso","name":"uso","type":"uint8"},{"internalType":"string","name":"serialNumber","type":"string"},{"internalType":"uint256","name":"dataProducao","type":"uint256"},{"internalType":"string","name":"lote","type":"string"},{"internalType":"uint256","name":"dataRegistro","type":"uint256"}],"internalType":"struct RegistroBateriasMoura_Public.BateriaDefeituosa","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getContagemTotal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"listaBateriasDefeituosas","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"tipo","type":"string"},{"internalType":"enum RegistroBateriasMoura_Public.TipoUso","name":"uso","type":"uint8"},{"internalType":"string","name":"serialNumber","type":"string"},{"internalType":"uint256","name":"dataProducao","type":"uint256"},{"internalType":"string","name":"lote","type":"string"},{"internalType":"uint256","name":"dataRegistro","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"listarBaterias","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"tipo","type":"string"},{"internalType":"enum RegistroBateriasMoura_Public.TipoUso","name":"uso","type":"uint8"},{"internalType":"string","name":"serialNumber","type":"string"},{"internalType":"uint256","name":"dataProducao","type":"uint256"},{"internalType":"string","name":"lote","type":"string"},{"internalType":"uint256","name":"dataRegistro","type":"uint256"}],"internalType":"struct RegistroBateriasMoura_Public.BateriaDefeituosa[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_tipo","type":"string"},{"internalType":"enum RegistroBateriasMoura_Public.TipoUso","name":"_uso","type":"uint8"},{"internalType":"string","name":"_serialNumber","type":"string"},{"internalType":"uint256","name":"_dataProducao","type":"uint256"},{"internalType":"string","name":"_lote","type":"string"}],"name":"registrarBateria","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"_serialNumber","type":"string"}],"name":"removerBateria","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
+
+        let provider, signer, contract;
+        const [connectButton, walletStatus, dappContent, statusMessage, registerForm, removeForm, consultarForm, refreshListButton, batteryListDiv, consultaResultadoDiv] = [
+            'connectButton', 'wallet-status', 'dappContent', 'status-message', 'registerForm', 'removeForm', 'consultarForm', 'refreshListButton', 'battery-list', 'consulta-resultado'
+        ].map(id => document.getElementById(id));
+        
+        const tipoUsoMap = ['Automotivo', 'Náutico', 'Industrial', 'Estacionária', 'Acumulador'];
+
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-${type}`;
+            statusMessage.style.display = 'block';
+        }
+
+        function hideStatus() { statusMessage.style.display = 'none'; }
+
+        function openTab(evt, tabName) {
+            document.querySelectorAll(".tab-content").forEach(tc => tc.style.display = "none");
+            document.querySelectorAll(".tab-button").forEach(tb => tb.classList.remove("active"));
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+
+        function formatTimestamp(timestamp) {
+            if (timestamp == 0) return 'N/A';
+            // As datas de formulário HTML são interpretadas como UTC, então o tratamento é simples
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        }
+
+        function createBatteryCard(bateria) {
+            const card = document.createElement('div');
+            card.className = 'battery-card';
+            card.innerHTML = `
+                <div class="battery-card-header">
+                    N/S: <strong>${bateria.serialNumber}</strong>
+                </div>
+                <div class="battery-card-body">
+                    <p><strong>ID Blockchain:</strong> <span>${bateria.id}</span></p>
+                    <p><strong>Tipo:</strong> <span>${bateria.tipo}</span></p>
+                    <p><strong>Uso:</strong> <span>${tipoUsoMap[bateria.uso]}</span></p>
+                    <p><strong>Lote:</strong> <span>${bateria.lote}</span></p>
+                    <p><strong>Data de Produção:</strong> <span>${formatTimestamp(bateria.dataProducao)}</span></p>
+                    <p><strong>Data do Registro:</strong> <span>${new Date(bateria.dataRegistro * 1000).toLocaleString('pt-BR')}</span></p>
+                </div>
+            `;
+            return card;
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') return alert("Por favor, instale o MetaMask!");
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+                walletStatus.textContent = `Conectado: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                connectButton.textContent = "Carteira Conectada";
+                connectButton.disabled = true;
+                document.getElementById('connect-section').style.backgroundColor = '#e9f5ff';
+                dappContent.style.display = 'block';
+                await listBatteries();
+            } catch (error) {
+                console.error("Erro ao conectar a carteira:", error);
+                walletStatus.textContent = "Falha na conexão.";
+            }
+        }
+
+        async function listBatteries() {
+            if (!contract) return;
+            showStatus('Buscando baterias registradas...', 'info');
+            try {
+                const batteries = await contract.listarBaterias();
+                batteryListDiv.innerHTML = '';
+                if (batteries.length === 0) {
+                    batteryListDiv.innerHTML = '<p class="empty-state">Nenhuma bateria defeituosa encontrada.</p>';
+                } else {
+                    batteries.forEach(bateria => batteryListDiv.appendChild(createBatteryCard(bateria)));
+                }
+                hideStatus();
+            } catch (error) {
+                console.error("Erro ao listar baterias:", error);
+                showStatus(`Erro ao buscar a lista: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleTransaction(form, action, ...args) {
+            event.preventDefault();
+            if (!contract) return;
+
+            const actionMessages = {
+                register: { start: 'Enviando transação para registro...', wait: 'Aguardando confirmação do registro...', success: 'Bateria registrada com sucesso!', error: 'Erro no registro:' },
+                remove: { start: 'Enviando transação para remoção...', wait: 'Aguardando confirmação da remoção...', success: 'Bateria removida com sucesso!', error: 'Erro na remoção:' }
+            };
+            const messages = actionMessages[action];
+            
+            showStatus(messages.start, 'info');
+            try {
+                const contractMethod = action === 'register' ? contract.registrarBateria : contract.removerBateria;
+                const tx = await contractMethod(...args);
+                showStatus(messages.wait, 'info');
+                await tx.wait();
+                showStatus(messages.success, 'success');
+                form.reset();
+                await listBatteries();
+            } catch (error) {
+                console.error(`${messages.error} ${error}`);
+                showStatus(`${messages.error} ${error.reason || error.message}`, 'error');
+            }
+        }
+
+        registerForm.addEventListener('submit', (event) => {
+            const tipo = document.getElementById('tipo').value;
+            const uso = document.getElementById('uso').value;
+            const serialNumber = document.getElementById('serialNumber').value;
+            const dataProducaoStr = document.getElementById('dataProducao').value;
+            const lote = document.getElementById('lote').value;
+            // O campo de data do HTML já fornece uma data sem fuso horário (meia-noite UTC).
+            // A conversão para timestamp é direta.
+            const dataProducaoTimestamp = new Date(dataProducaoStr).getTime() / 1000;
+            handleTransaction(registerForm, 'register', tipo, uso, serialNumber, dataProducaoTimestamp, lote);
+        });
+
+        removeForm.addEventListener('submit', (event) => {
+            const serialNumber = document.getElementById('removeSerialNumber').value;
+            handleTransaction(removeForm, 'remove', serialNumber);
+        });
+        
+        async function consultarBateria(event) {
+            event.preventDefault();
+            if (!contract) return;
+            const serialNumberToFind = document.getElementById('consultarSerialNumber').value;
+            showStatus(`Consultando pelo número de série: ${serialNumberToFind}...`, 'info');
+            consultaResultadoDiv.innerHTML = '';
+            try {
+                // A forma mais simples e que já funcionava: busca na lista completa.
+                const batteries = await contract.listarBaterias();
+                const resultado = batteries.find(b => b.serialNumber === serialNumberToFind);
+                if (resultado) {
+                    consultaResultadoDiv.appendChild(createBatteryCard(resultado));
+                    hideStatus();
+                } else {
+                    consultaResultadoDiv.innerHTML = `<p class="empty-state">Nenhuma bateria encontrada com o número de série '${serialNumberToFind}'.</p>`;
+                    hideStatus();
+                }
+            } catch (error) {
+                console.error("Erro ao consultar bateria:", error);
+                showStatus(`Erro na consulta: ${error.reason || error.message}`, 'error');
+            }
+        }
+
+        connectButton.addEventListener('click', connectWallet);
+        consultarForm.addEventListener('submit', consultarBateria);
+        refreshListButton.addEventListener('click', listBatteries);
+    </script>
+</body>
+</html>
