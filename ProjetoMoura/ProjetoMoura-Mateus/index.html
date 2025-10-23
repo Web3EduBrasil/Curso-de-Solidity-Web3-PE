@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DApp Baterias Moura</title>
+  
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ========= ESTILO GLOBAL ========= */
+    :root {
+      --primary: #ffe600;
+      --blue-dark: #003a91;
+      --blue-light: #007bff;
+      --bg-glass: rgba(255, 255, 255, 0.1);
+      --bg-glass-light: rgba(255, 255, 255, 0.15);
+      --text-light: #ffffff;
+      --border-light: rgba(255, 255, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue-light));
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ========= HEADER ========= */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 18px 20px;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      font-weight: 600;
+      font-size: 1.6em;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    /* === ESTILO DA LOGO ADICIONADO === */
+    header img {
+      height: 45px;
+      width: auto;
+    }
+
+    /* ========= CONTEÚDO ========= */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 92%;
+      margin: 40px auto;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      padding: 35px 30px;
+      border: 1px solid var(--border-light);
+    }
+
+    h2 {
+      color: var(--primary);
+      margin: 0; /* Removido margin-bottom */
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 1.3em;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 600;
+      margin-bottom: 20px; /* Aumentado espaço */
+    }
+    
+    .section-title i {
+        font-size: 1.2em;
+        color: var(--primary);
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 40px 0; /* Aumentado espaço */
+    }
+
+    /* ========= INPUTS E BOTÕES ========= */
+    input, button {
+      padding: 12px 15px;
+      margin: 0; /* Removido margin default */
+      border-radius: 10px;
+      font-size: 1em;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--border-light);
+      background: var(--bg-glass-light);
+      color: #fff;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+
+    input:focus {
+      background: rgba(255,255,255,0.25);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
+    }
+    
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    button {
+      border: none;
+      background: var(--primary);
+      color: var(--blue-dark);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      background: #fff33b;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    #connectButton {
+      font-size: 1.1em;
+      padding: 14px 24px;
+      margin-bottom: 10px;
+    }
+
+    /* ========= STATUS E CONTA ========= */
+    #account {
+      font-size: 0.9em;
+      background: var(--bg-glass);
+      padding: 8px 14px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 10px;
+      border: 1px solid var(--border-light);
+      word-break: break-all;
+    }
+
+    #status {
+      margin-top: 25px;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95em;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--primary);
+      text-shadow: 0 0 6px rgba(255, 230, 0, 0.4);
+      display: none; /* Oculto por padrão */
+    }
+    
+    /* Mostra o status apenas se tiver conteúdo */
+    #status:not(:empty) {
+        display: block;
+    }
+
+    /* ========= SEÇÕES DE FORMULÁRIO ========= */
+    
+    /* Grid para o formulário de adicionar */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    /* Botão de cadastro com largura total */
+    .btn-full {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px;
+        font-size: 1.1em;
+    }
+    
+    /* Container da busca com flex */
+    .search-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+    .search-container input {
+        flex: 1; /* Input cresce para preencher espaço */
+        min-width: 200px;
+    }
+    
+    #bateriaInfo {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    /* ========= LISTA DE BATERIAS ========= */
+    .bateria-card {
+      background: var(--bg-glass-light);
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      padding: 16px 22px;
+      margin: 12px 0;
+      text-align: left;
+      color: #fff;
+      transition: transform 0.3s ease, background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      line-height: 1.7;
+    }
+
+    .bateria-card:hover {
+      transform: scale(1.02);
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .bateria-card strong {
+        color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    #listaBaterias {
+      max-height: 350px; /* Aumentado */
+      overflow-y: auto;
+      margin-top: 20px;
+      padding-right: 8px;
+    }
+
+    /* ========= SCROLL ========= */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.2);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #fff33b;
+    }
+
+    /* ========= RESPONSIVIDADE ========= */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr; /* Coluna única em telas menores */
+            gap: 12px;
+        }
+    }
+    
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        font-size: 1.3em;
+        text-align: center;
+        gap: 10px;
+      }
+
+      main {
+        padding: 25px 15px;
+        margin: 20px auto;
+        width: 95%;
+      }
+      
+      .search-container {
+         flex-direction: column;
+         align-items: stretch; /* Botão e input 100% */
+      }
+      
+      .search-container input,
+      .search-container button {
+          width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="mora logo.png" alt="Logo Moura">
+    <span>DApp Baterias Moura</span>
+  </header>
+
+  <main>
+    <button id="connectButton"><i class="fa-brands fa-meta-mask"></i> Conectar MetaMask</button>
+    <p id="account">Carteira: não conectada</p>
+
+    <hr>
+
+    <div class="section-title"><i class="fa-solid fa-plus-circle"></i> <h2>Adicionar Bateria</h2></div>
+    <div class="form-container">
+      <div class="form-grid">
+        <input type="text" id="tipo" placeholder="Tipo (ex: automotiva)">
+        <input type="text" id="uso" placeholder="Uso (ex: carro, moto)">
+        <input type="text" id="numeroSerie" placeholder="Número de Série">
+        <input type="text" id="dataProd" placeholder="Data de Produção">
+        <input type="text" id="lote" placeholder="Lote">
+      </div>
+      <button id="addButton" class="btn-full"><i class="fa-solid fa-plus"></i> Cadastrar Bateria</button>
+    </div>
+
+    <hr>
+
+    <div class="section-title"><i class="fa-solid fa-search"></i> <h2>Consultar Bateria</h2></div>
+    <div class="search-container">
+      <input type="number" id="indexInput" placeholder="Índice da bateria">
+      <button id="getButton"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+      
+      <div id="bateriaInfo">
+          </div>
+    </div>
+
+    <hr>
+
+    <div class="section-title"><i class="fa-solid fa-list-ul"></i> <h2>Listar Todas</h2></div>
+    <button id="listarButton"><i class="fa-solid fa-arrows-rotate"></i> Listar Baterias</button>
+    <div id="listaBaterias">
+        </div>
+
+    <p id="status"></p>
+  </main>
+
+  <script>
+    let web3;
+    let contract;
+    const contractAddress = "0x3b98c8D0A09bf663eC8CE0d458810eA5402A89aF";
+    const contractABI = [
+      {
+        "inputs": [
+          {"internalType": "string","name": "_tipo","type": "string"},
+          {"internalType": "string","name": "_uso","type": "string"},
+          {"internalType": "string","name": "_numeroSerie","type": "string"},
+          {"internalType": "string","name": "_dataProd","type": "string"},
+          {"internalType": "string","name": "_lote","type": "string"}
+        ],
+        "name": "adicionarBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [{"internalType": "uint256","name": "_index","type": "uint256"}],
+        "name": "getBateria",
+        "outputs": [
+          {"internalType": "string","name": "tipo","type": "string"},
+          {"internalType": "string","name": "uso","type": "string"},
+          {"internalType": "string","name": "numeroSerie","type": "string"},
+          {"internalType": "string","name": "dataProd","type": "string"},
+          {"internalType": "string","name": "lote","type": "string"}
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "listar",
+        "outputs": [
+          {
+            "components": [
+              {"internalType": "string","name": "tipo","type": "string"},
+              {"internalType": "string","name": "uso","type": "string"},
+              {"internalType": "string","name": "numeroSerie","type": "string"},
+              {"internalType": "string","name": "dataProd","type": "string"},
+              {"internalType": "string","name": "lote","type": "string"}
+            ],
+            "internalType": "struct BateriasDefeituosasMoura.Bateria[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalBaterias",
+        "outputs": [{"internalType": "uint256","name": "","type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    // Conectar MetaMask
+    document.getElementById('connectButton').addEventListener('click', async () => {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          const account = accounts[0];
+          document.getElementById('account').textContent = "Carteira: " + account;
+          contract = new web3.eth.Contract(contractABI, contractAddress);
+          document.getElementById('status').textContent = "✅ Conectado à MetaMask!";
+        } catch (error) {
+          console.error(error);
+          document.getElementById('status').textContent = "❌ Erro ao conectar MetaMask.";
+        }
+      } else {
+        alert("Por favor, instale o MetaMask!");
+      }
+    });
+
+    // Adicionar bateria
+    document.getElementById('addButton').addEventListener('click', async () => {
+      if (!contract) return alert("Conecte primeiro sua carteira!");
+      const tipo = document.getElementById('tipo').value;
+      const uso = document.getElementById('uso').value;
+      const numeroSerie = document.getElementById('numeroSerie').value;
+      const dataProd = document.getElementById('dataProd').value;
+      const lote = document.getElementById('lote').value;
+
+      // Limpar campos após pegar os valores
+      document.getElementById('tipo').value = '';
+      document.getElementById('uso').value = '';
+      document.getElementById('numeroSerie').value = '';
+      document.getElementById('dataProd').value = '';
+      document.getElementById('lote').value = '';
+
+      const accounts = await web3.eth.getAccounts();
+      try {
+        document.getElementById('status').textContent = "⏳ Enviando transação... Por favor, aguarde.";
+        await contract.methods.adicionarBateria(tipo, uso, numeroSerie, dataProd, lote)
+          .send({ from: accounts[0] });
+        document.getElementById('status').textContent = "✅ Bateria adicionada com sucesso!";
+      } catch (error) {
+        console.error(error);
+        document.getElementById('status').textContent = "❌ Erro ao adicionar bateria.";
+      }
+    });
+
+    // Buscar bateria
+    document.getElementById('getButton').addEventListener('click', async () => {
+      const index = document.getElementById('indexInput').value;
+      if (!contract) return alert("Conecte primeiro sua carteira!");
+      try {
+        document.getElementById('status').textContent = "🔍 Buscando...";
+        const result = await contract.methods.getBateria(index).call();
+        document.getElementById('bateriaInfo').innerHTML = `
+          <div class="bateria-card">
+            <strong>Tipo:</strong> ${result.tipo}<br>
+            <strong>Uso:</strong> ${result.uso}<br>
+            <strong>Número de Série:</strong> ${result.numeroSerie}<br>
+            <strong>Data Produção:</strong> ${result.dataProd}<br>
+            <strong>Lote:</strong> ${result.lote}
+          </div>`;
+        document.getElementById('status').textContent = "✅ Bateria encontrada!";
+      } catch (error) {
+        console.error(error);
+        document.getElementById('bateriaInfo').innerHTML = ""; // Limpa info anterior
+        document.getElementById('status').textContent = "❌ Bateria não encontrada ou erro na busca.";
+      }
+    });
+
+    // Listar todas
+    document.getElementById('listarButton').addEventListener('click', async () => {
+      if (!contract) return alert("Conecte primeiro sua carteira!");
+      try {
+        document.getElementById('status').textContent = "📋 Atualizando lista...";
+        const baterias = await contract.methods.listar().call();
+        const listaDiv = document.getElementById('listaBaterias');
+        listaDiv.innerHTML = "";
+        if (baterias.length === 0) {
+          listaDiv.innerHTML = "<p>Nenhuma bateria cadastrada.</p>";
+          document.getElementById('status').textContent = "ℹ️ Nenhuma bateria na lista.";
+          return;
+        }
+        baterias.forEach((b, i) => {
+          const card = document.createElement('div');
+          card.className = "bateria-card";
+          card.innerHTML = `
+            <strong>Bateria #${i}</strong><br>
+            Tipo: ${b.tipo}<br>
+            Uso: ${b.uso}<br>
+            Nº Série: ${b.numeroSerie}<br>
+            Data: ${b.dataProd}<br>
+            Lote: ${b.lote}`;
+          listaDiv.appendChild(card);
+        });
+        document.getElementById('status').textContent = "📋 Listagem atualizada!";
+      } catch (error) {
+        console.error(error);
+        document.getElementById('status').textContent = "❌ Erro ao listar baterias.";
+      }
+    });
+  </script>
+</body>
+</html>
