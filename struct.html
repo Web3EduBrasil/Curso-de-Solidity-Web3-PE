@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuários DApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #3B3B3B; /* Cor de fundo escura, como pedra */
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAApklEQVRYo+3VMQoAIAgE0Pz/v3QoWhgG7aA4027d7E5a8wYAAAAAAAAAAAAAAAAA8G2zNz8/n398Z9qCiJikA2ZkQ3cyotv2zGvJvP1iRPSb45k/eYcZ+SP2yjjvO2Yk/Vljfpn9dYyIznmPmfm/mdk/ZpQZ2R+tiMj+Y0Zk/8kPMyL7z7D8TAbYx0/M580X8/kMAAAAAElFTkSuQmCC'); /* Textura de pedra sutil */
+            color: #FFFFFF;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            image-rendering: pixelated; /* Garante que as imagens de fundo fiquem pixeladas */
+        }
+        .container {
+            background-color: #C6C6C6; /* Cinza claro, como a UI do Minecraft */
+            padding: 20px;
+            border: 4px solid #585858;
+            box-shadow: 0 0 0 4px #000000;
+            width: 100%;
+            max-width: 700px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #000000;
+            text-shadow: 2px 2px #AAAAAA;
+            margin-bottom: 25px;
+        }
+        .card {
+            background-color: #8B8B8B;
+            border: 4px solid #585858;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 0 4px #000000;
+        }
+        button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            background-color: #7D7D7D;
+            color: #DDDDDD;
+            border: 2px solid #000000;
+            box-shadow: inset -2px -4px 0px 0px #585858, inset 2px 2px 0px 0px #A0A0A0;
+            padding: 12px 18px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            text-shadow: 2px 2px #3B3B3B;
+        }
+        button:hover:not(:disabled) {
+            background-color: #878787;
+            color: #FFFFAF; /* Cor amarela ao passar o mouse */
+        }
+        button:active:not(:disabled) {
+            box-shadow: inset 2px 2px 0px 0px #585858, inset -2px -4px 0px 0px #A0A0A0;
+            padding-top: 14px;
+            padding-bottom: 10px;
+        }
+        button:disabled {
+            background-color: #505050;
+            color: #9E9E9E;
+            cursor: not-allowed;
+            text-shadow: 2px 2px #2A2A2A;
+            box-shadow: inset -2px -4px 0px 0px #3B3B3B, inset 2px 2px 0px 0px #7D7D7D;
+        }
+        input[type="text"], input[type="number"] {
+            font-family: 'Press Start 2P', cursive;
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            background-color: #000000;
+            border: 2px solid #585858;
+            color: #FFFFFF;
+        }
+        #status, #accountInfo {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            word-wrap: break-word;
+            padding: 10px;
+            text-shadow: 2px 2px #000;
+        }
+        #accountInfo { color: #55FF55; } /* Verde Minecraft */
+        #status { color: #FF5555; } /* Vermelho Minecraft */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #8B8B8B;
+            border: 4px solid #000000;
+        }
+        th, td {
+            border: 2px solid #585858;
+            padding: 10px;
+            text-align: left;
+            word-break: break-all;
+            color: #FFFFFF;
+            text-shadow: 2px 2px #3B3B3B;
+        }
+        th {
+            background-color: #585858;
+            color: #FFFFFF;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cadastro de Usuários na Blockchain</h1>
+
+        <div class="card">
+            <h2>Conexão</h2>
+            <button id="connectButton">Conectar Carteira</button>
+            <div id="accountInfo"></div>
+        </div>
+
+        <div class="card">
+            <h2>1. Cadastre-se</h2>
+            <input type="text" id="nameInput" placeholder="Digite seu nome" disabled>
+            <button id="registerButton" disabled>Cadastrar</button>
+        </div>
+        
+        <div class="card">
+            <h2>2. Remover Usuário por ID</h2>
+            <input type="number" id="removeIdInput" placeholder="Digite o ID do usuário (ex: 1)" disabled>
+            <button id="removeButton" disabled>Remover</button>
+        </div>
+
+        <div class="card">
+            <h2>3. Lista de Usuários</h2>
+            <button id="listButton" disabled>Atualizar Lista</button>
+            <div id="userListContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Endereço</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userListBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÕES DO CONTRATO ---
+        const contractAddress = "0xee3830CB9C6044EC20955129B3Cdc8Fd74ad4D37";
+        // ABI (Interface Binária da Aplicação) do seu contrato
+        const contractABI = [
+            { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+            { "inputs": [{ "internalType": "string", "name": "_nome", "type": "string" }], "name": "cadastrarUsuario", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+            { "inputs": [], "name": "listarUsuarios", "outputs": [{ "components": [{ "internalType": "address", "name": "endereco", "type": "address" }, { "internalType": "string", "name": "nome", "type": "string" }], "internalType": "struct CadastroUsuarios.Cadastro[]", "name": "", "type": "tuple[]" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [{ "internalType": "uint256", "name": "_id", "type": "uint256" }], "name": "removerUsuario", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+        ];
+
+        // --- VARIÁVEIS GLOBAIS ---
+        let provider, signer, contract;
+
+        // --- ELEMENTOS DO DOM ---
+        const connectButton = document.getElementById('connectButton');
+        const registerButton = document.getElementById('registerButton');
+        const listButton = document.getElementById('listButton');
+        const removeButton = document.getElementById('removeButton');
+        const nameInput = document.getElementById('nameInput');
+        const removeIdInput = document.getElementById('removeIdInput');
+        const accountInfo = document.getElementById('accountInfo');
+        const status = document.getElementById('status');
+        const userListBody = document.getElementById('userListBody');
+
+        // --- FUNÇÕES DE INTERAÇÃO ---
+
+        // Conectar Carteira
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                return showError("MetaMask não detectado! Por favor, instale a extensão.");
+            }
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const userAddress = await signer.getAddress();
+
+                accountInfo.innerText = `Conectado: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                connectButton.disabled = true;
+                connectButton.innerText = 'Conectado';
+                
+                // Habilita a interface
+                nameInput.disabled = false;
+                registerButton.disabled = false;
+                listButton.disabled = false;
+                removeIdInput.disabled = false;
+                removeButton.disabled = false;
+                
+                // Carrega a lista inicial
+                await listUsers();
+            } catch (err) {
+                showError("Falha ao conectar a carteira.");
+                console.error(err);
+            }
+        }
+
+        // Cadastrar Usuário
+        async function registerUser() {
+            const name = nameInput.value;
+            if (!name) return showError("O campo nome é obrigatório.");
+            
+            showStatus("Aguardando confirmação na MetaMask...");
+            try {
+                const tx = await contract.cadastrarUsuario(name);
+                showStatus("Processando transação...");
+                await tx.wait();
+                showSuccess(`Usuário "${name}" cadastrado com sucesso!`);
+                nameInput.value = '';
+                await listUsers(); // Atualiza a lista
+            } catch (err) {
+                showError("Erro ao cadastrar usuário.");
+                console.error(err);
+            }
+        }
+        
+        // Remover Usuário
+        async function removeUser() {
+            const id = removeIdInput.value;
+            if (id === '' || id < 0) return showError("Por favor, insira um ID válido.");
+            
+            showStatus("Aguardando confirmação na MetaMask para remover...");
+            try {
+                const tx = await contract.removerUsuario(id);
+                showStatus("Processando remoção...");
+                await tx.wait();
+                showSuccess(`Usuário com ID ${id} removido.`);
+                removeIdInput.value = '';
+                await listUsers(); // Atualiza a lista
+            } catch (err) {
+                showError("Erro ao remover usuário. Verifique o ID.");
+                console.error(err);
+            }
+        }
+
+        // Listar Usuários
+        async function listUsers() {
+            showStatus("Buscando lista de usuários...");
+            try {
+                const users = await contract.listarUsuarios();
+                userListBody.innerHTML = ''; // Limpa a tabela
+                
+                if (users.length === 0) {
+                    userListBody.innerHTML = '<tr><td colspan="3">Nenhum usuário cadastrado.</td></tr>';
+                } else {
+                    users.forEach((user, index) => {
+                        const address = user.endereco;
+                        const name = user.nome;
+                        
+                        if (address !== "0x0000000000000000000000000000000000000000") {
+                             const row = `<tr>
+                                <td>${index}</td>
+                                <td>${name}</td>
+                                <td>${address}</td>
+                            </tr>`;
+                            userListBody.innerHTML += row;
+                        }
+                    });
+                }
+                showStatus(""); // Limpa status
+            } catch (err) {
+                showError("Erro ao buscar a lista de usuários.");
+                console.error(err);
+            }
+        }
+
+        // Funções auxiliares de status
+        function showStatus(message) {
+            status.style.color = '#FFAA00'; // Laranja
+            status.innerText = message;
+        }
+        function showSuccess(message) {
+            status.style.color = '#55FF55'; // Verde
+            status.innerText = message;
+        }
+        function showError(message) {
+            status.style.color = '#FF5555'; // Vermelho
+            status.innerText = message;
+        }
+
+        // --- EVENT LISTENERS ---
+        connectButton.addEventListener('click', connectWallet);
+        registerButton.addEventListener('click', registerUser);
+        listButton.addEventListener('click', listUsers);
+        removeButton.addEventListener('click', removeUser);
+    </script>
+</body>
+</html>
