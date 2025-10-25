@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciamento de Baterias Defeituosas | Moura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+
+  <style>
+    :root {
+      --azul-moura: #0033A0;
+      --azul-moura-hover: #00267A;
+      --amarelo-moura: #FDB913;
+      --amarelo-moura-hover: #e0a50f;
+      --cinza-claro: #F8F9FA;
+      --cinza-borda: #E0E0E0;
+      --texto: #1A1A1A;
+      --texto-secundario: #555;
+      --vermelho-remover: #D93025;
+      --vermelho-remover-hover: #b0261e;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--cinza-claro);
+      color: var(--texto);
+      margin: 0;
+    }
+
+    /* === Estilos do Header Atualizado === */
+    header {
+      background-color: var(--azul-moura);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+      height: 70px;
+    }
+
+    header .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    header .logo { 
+        width: 120px; /* Ajustado para o logo real */
+        height: auto;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 1.2rem;
+      margin: 0;
+      font-weight: 600;
+      flex-grow: 1; 
+      text-align: center;
+    }
+
+    #connectButton {
+      background-color: var(--amarelo-moura);
+      color: var(--texto);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      z-index: 2;
+    }
+    #connectButton:hover { background-color: var(--amarelo-moura-hover); }
+    #connectButton:disabled { background-color: #f0f0f0; color: #999; cursor: default; }
+
+    .arrow-icon {
+        position: absolute;
+        right: 180px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px; 
+        height: 40px;
+        fill: var(--amarelo-moura);
+        z-index: 1;
+    }
+    
+    /* === Fim Estilos do Header === */
+    
+    main {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      padding: 30px 40px;
+    }
+
+    h2 {
+      color: var(--azul-moura);
+      border-left: 6px solid var(--amarelo-moura);
+      padding-left: 10px;
+      font-size: 1.3rem;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 30px;
+      margin-top: 20px;
+    }
+
+    label { font-weight: 600; font-size: 0.9rem; color: var(--texto-secundario); margin-bottom: 8px; display: block; }
+    
+    /* === Estilos unificados para inputs, selects e textarea === */
+    input[type="text"], input[type="date"], select, textarea {
+      padding: 12px;
+      border: 1px solid var(--cinza-borda);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      width: 100%;
+      box-sizing: border-box; /* Garante que padding não afete a largura total */
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background-color: white;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    select {
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%23555%22/%3E%3C/svg%3E');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+    }
+
+    textarea {
+        resize: vertical; /* Permite que o usuário redimensione verticalmente */
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--azul-moura);
+      box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.1);
+    }
+    /* === Fim dos estilos unificados === */
+
+    .form-full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-submit-container {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    button:active { transform: translateY(0); box-shadow: none; }
+
+    button[type="submit"] { background-color: var(--azul-moura); color: white; }
+    button[type="submit"]:hover { background-color: var(--azul-moura-hover); }
+
+    .remove-btn {
+      background-color: var(--vermelho-remover);
+      color: white;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+    .remove-btn:hover { background-color: var(--vermelho-remover-hover); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      min-width: 700px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--cinza-borda);
+    }
+
+    th {
+      background-color: var(--azul-moura);
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+    }
+
+    tr:nth-child(even) { background-color: #FAFAFA; }
+    tr:hover { background-color: #F0F4FF; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="https://s34918.pcdn.co/wp-content/uploads/assets/imgs/moura/logo-moura.svg" alt="Logo Moura" class="logo">
+    </div>
+    <h1>Sistema de Gerenciamento de Baterias Defeituosas</h1>
+    
+    <button id="connectButton">Conectar Carteira</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>Cadastrar Nova Bateria</h2>
+      <form id="batteryForm">
+    <div>
+      <label for="tipo">Tipo:</label>
+      <select id="tipo" required>
+        <option value="" disabled selected>Selecione o tipo de bateria</option>
+        <option value="Tracionária">Tracionária</option>
+        <option value="Estacionária">Estacionária</option>
+        <option value="Metroferroviária">Metroferroviária</option>
+        <option value="Carro">Carro</option>
+        <option value="ônibusecaminhão">Ônibus e caminhão</option>
+        <option value="Moto">Moto</option>
+        <option value="Náutica">Náutica</option>
+        <option value="BESS">BESS (Sistemas de Armazenamento)</option>
+      </select>
+    </div>
+    
+    <div>
+      <label for="uso">Uso Principal:</label>
+      <select id="uso" required>
+        <option value="" disabled selected>Selecione o uso principal</option>
+        
+        <optgroup label="Automotivo e Transporte">
+          <option value="Veículo de Passeio (Leve)">Veículo de Passeio (Leve)</option>
+          <option value="Veículo com Start-Stop">Veículo com Start-Stop</option>
+          <option value="Veículo Pesado (Caminhão/Ônibus)">Veículo Pesado (Caminhão/Ônibus)</option>
+          <option value="Máquina Agrícola">Máquina Agrícola</option>
+          <option value="Motocicleta / Scooter">Motocicleta / Scooter</option>
+        </optgroup>
+
+        <optgroup label="Movimentação e Indústria">
+          <option value="Empilhadeira Elétrica">Empilhadeira Elétrica</option>
+          <option value="Plataforma Elevatória">Plataforma Elevatória</option>
+          <option value="Veículo Elétrico Industrial">Veículo Elétrico Industrial</option>
+          <option value="Rebocador Industrial">Rebocador Industrial</option>
+        </optgroup>
+
+        <optgroup label="Backup e Energia Estacionária">
+          <option value="Nobreak / UPS">Nobreak / UPS</option>
+          <option value="Energia Solar / Eólica">Energia Solar / Eólica</option>
+          <option value="Telecomunicações / PABX">Telecomunicações / PABX</option>
+          <option value="Sistema de Alarme e Segurança">Sistema de Alarme e Segurança</option>
+          <option value="Iluminação de Emergência">Iluminação de Emergência</option>
+          <option value="Data Center">Data Center</option>
+        </optgroup>
+
+        <optgroup label="Sistemas de Grande Porte">
+            <option value="Estabilização de Rede (Grid)">Estabilização de Rede (Grid - BESS)</option>
+            <option value="Backup Industrial/Comercial">Backup Industrial/Comercial (BESS)</option>
+            <option value="Sistemas Metroferroviários">Sistemas Metroferroviários</option>
+        </optgroup>
+
+        <optgroup label="Náutico e Lazer">
+          <option value="Partida de Motor (Náutico)">Partida de Motor (Náutico)</option>
+          <option value="Serviço de Bordo (Náutico)">Serviço de Bordo (Náutico)</option>
+          <option value="Jet Ski">Jet Ski</option>
+          <option value="Carro de Golfe">Carro de Golfe</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div>
+      <label for="nr_serie">Nº de Série:</label>
+      <input type="text" id="nr_serie" required>
+    </div>
+    <div>
+      <label for="dataprod">Data de Produção:</label>
+      <input type="date" id="dataprod" required>
+    </div>
+    <div>
+      <label for="lote">Lote:</label>
+      <input type="text" id="lote" required>
+    </div>
+    <div class="form-full-width">
+      <label for="desc_defeito">Descrição do Defeito:</label>
+      <textarea id="desc_defeito" rows="3" required></textarea>
+    </div>
+    <div class="form-submit-container">
+      <button type="submit">Cadastrar</button>
+    </div>
+</form>
+      </form>
+    </section>
+
+    <section class="section">
+      <h2>Baterias Cadastradas</h2>
+      <table id="bateriasTable">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Uso</th>
+            <th>Nº Série</th>
+            <th>Data Produção</th>
+            <th>Lote</th>
+            <th>Defeito</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const ABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "desc_defeito",
+				"type": "string"
+			}
+		],
+		"name": "adicionarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "deleteBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "desc_defeito",
+				"type": "string"
+			}
+		],
+		"name": "editarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getBateria",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "desc_defeito",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasDefeituosas.Bateria",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBaterias",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "desc_defeito",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasDefeituosas.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    const contractAddress = "0xFf7aAAe1C018c1869d530Cd6Fe682b04b07B703a";
+    let provider, signer, contract;
+
+    const connectButton = document.getElementById("connectButton");
+    const form = document.getElementById("batteryForm");
+    const tableBody = document.querySelector("#bateriasTable tbody");
+    let editarIndex = null;
+
+    connectButton.addEventListener("click", async () => {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          provider = new ethers.BrowserProvider(window.ethereum);
+          signer = await provider.getSigner();
+          contract = new ethers.Contract(contractAddress, ABI, signer);
+
+          const userAddress = await signer.getAddress();
+          connectButton.textContent = `Conectado: ${userAddress.substring(0, 6)}...${userAddress.slice(-4)}`;
+          connectButton.disabled = true;
+
+          alert("Carteira conectada com sucesso!");
+          carregarBaterias();
+        } catch (err) {
+          console.error("Erro ao conectar carteira:", err);
+          alert("Falha ao conectar a carteira.");
+        }
+      } else {
+        alert("Instale o MetaMask para continuar.");
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!contract) return alert("Conecte a carteira primeiro");
+      
+      const submitButton = form.querySelector('button[type="submit"]');
+
+      const tipo = document.getElementById("tipo").value;
+      const uso = document.getElementById("uso").value;
+      const nr_serie = document.getElementById("nr_serie").value;
+      const dataprod = document.getElementById("dataprod").value;
+      const lote = document.getElementById("lote").value;
+      const desc_defeito = document.getElementById("desc_defeito").value;
+
+      try {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Processando...';
+
+        let tx;
+        if (editarIndex !== null) {
+          tx = await contract.editarBateria(editarIndex, tipo, uso, nr_serie, dataprod, lote, desc_defeito);
+          await tx.wait();
+          alert("Bateria editada com sucesso!");
+        } else {
+          tx = await contract.adicionarBateria(tipo, uso, nr_serie, dataprod, lote, desc_defeito);
+          await tx.wait();
+          alert("Bateria cadastrada com sucesso!");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao processar operação.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Cadastrar';
+        editarIndex = null;
+        form.reset();
+        carregarBaterias();
+      }
+    });
+
+    async function carregarBaterias() {
+      if (!contract) return;
+      try {
+        const baterias = await contract.getBaterias();
+        tableBody.innerHTML = "";
+        baterias.forEach((b, i) => {
+          const row = `
+            <tr>
+              <td>${b.tipo}</td>
+              <td>${b.uso}</td>
+              <td>${b.nr_serie}</td>
+              <td>${b.dataprod}</td>
+              <td>${b.lote}</td>
+              <td>${b.desc_defeito}</td>
+              <td>
+                <button class="edit-btn" onclick="editar(${i})">Editar</button>
+                <button class="remove-btn" onclick="remover(${i})">Remover</button>
+              </td>
+            </tr>`;
+          tableBody.innerHTML += row;
+        });
+      } catch(err) {
+          console.error("Erro ao carregar baterias:", err);
+          alert("Não foi possível carregar os dados do contrato. Verifique a conexão e o endereço do contrato.");
+      }
+    }
+
+    async function remover(index) {
+      if (!confirm("Deseja realmente remover esta bateria?")) return;
+      if (!contract) return alert("Conecte a carteira primeiro");
+      try {
+        const tx = await contract.deleteBateria(index);
+        await tx.wait();
+        carregarBaterias();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao remover bateria.");
+      }
+    }
+
+    async function editar(index) {
+      if (!contract) return alert("Conecte a carteira primeiro");
+      try {
+        const b = await contract.getBateria(index);
+        document.getElementById("tipo").value = b.tipo;
+        document.getElementById("uso").value = b.uso;
+        document.getElementById("nr_serie").value = b.nr_serie;
+        document.getElementById("dataprod").value = b.dataprod;
+        document.getElementById("lote").value = b.lote;
+        document.getElementById("desc_defeito").value = b.desc_defeito;
+        editarIndex = index;
+        document.querySelector('button[type="submit"]').textContent = 'Salvar Edição';
+        window.scrollTo(0, 0); // Rola a página para o topo para mostrar o formulário
+      } catch (err) {
+          console.error("Erro ao carregar bateria para edição:", err);
+          alert("Não foi possível carregar os dados para edição.")
+      }
+    }
+  </script>
+</body>
+</html>
