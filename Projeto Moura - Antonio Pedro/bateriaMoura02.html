@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Moura Baterias - DApp</title>
+  <link rel="icon" type="image/png" sizes="16x16"  href="img/favicon-16x16.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('img/backmoura.jpeg');
+      background-size: cover;
+      background-position: center;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 420px;
+      margin: 10px 0;
+    }
+    input {
+      width: 95%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 8px;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #74b9ff;
+    }
+    .output {
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 0.9em;
+      word-break: break-word;
+    }
+    .wallet {
+      background: #dfe6e9;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #0984e3;
+      color: white;
+    }
+    .remove-btn {
+      background: #d63031;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #ff7675;
+    }
+    .logo img {
+      width: 200px;
+      height: 150px;
+      padding-bottom: 20px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img src="img/moura-logo-1.png" alt="Moura Baterias" />
+  </div>
+
+  <div class="card">
+    <button onclick="connectWallet()">🔗 Conectar Carteira</button>
+    <div id="wallet" class="wallet">Carteira: não conectada</div>
+  </div>
+
+  <div class="card">
+    <h3>📦 Registrar nova bateria</h3>
+    <input id="tipo" placeholder="Tipo da bateria">
+    <input id="uso" placeholder="Uso (ex: automotivo, industrial...)">
+    <input id="nr_serie" placeholder="Número de série">
+    <input id="dataprod" placeholder="Data de produção (ex: 05/2024)">
+    <input id="lote" placeholder="Lote">
+    <button onclick="registrarBateria()">Registrar</button>
+  </div>
+
+  <div class="card">
+    <h3>📊 Consultar total de baterias</h3>
+    <button onclick="verTotal()">Ver Total</button>
+    <div id="total" class="output"></div>
+  </div>
+
+  <div class="card">
+    <h3>🔍 Consultar bateria por índice</h3>
+    <input id="index" placeholder="Índice (0, 1, 2...)">
+    <button onclick="consultarBateria()">Consultar</button>
+    <div id="bateria" class="output"></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Listar todas as baterias</h3>
+    <button onclick="listarBaterias()">Listar</button>
+    <div id="lista" class="output"></div>
+  </div>
+
+  <script>
+    // ✅ ABI atualizada
+    const ABI = [
+      {
+        "inputs": [{"internalType": "uint256","name":"","type":"uint256"}],
+        "name":"baterias",
+        "outputs":[
+          {"internalType":"string","name":"tipo","type":"string"},
+          {"internalType":"string","name":"uso","type":"string"},
+          {"internalType":"string","name":"nr_serie","type":"string"},
+          {"internalType":"string","name":"dataprod","type":"string"},
+          {"internalType":"string","name":"lote","type":"string"}
+        ],
+        "stateMutability":"view",
+        "type":"function"
+      },
+      {
+        "inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],
+        "name":"getBateria",
+        "outputs":[
+          {"internalType":"string","name":"","type":"string"},
+          {"internalType":"string","name":"","type":"string"},
+          {"internalType":"string","name":"","type":"string"},
+          {"internalType":"string","name":"","type":"string"},
+          {"internalType":"string","name":"","type":"string"}
+        ],
+        "stateMutability":"view",
+        "type":"function"
+      },
+      {
+        "inputs":[],
+        "name":"listar",
+        "outputs":[{
+          "components":[
+            {"internalType":"string","name":"tipo","type":"string"},
+            {"internalType":"string","name":"uso","type":"string"},
+            {"internalType":"string","name":"nr_serie","type":"string"},
+            {"internalType":"string","name":"dataprod","type":"string"},
+            {"internalType":"string","name":"lote","type":"string"}
+          ],
+          "internalType":"struct MouraBateriasDefeituosas.Bateria[]",
+          "name":"",
+          "type":"tuple[]"
+        }],
+        "stateMutability":"view",
+        "type":"function"
+      },
+      {
+        "inputs":[
+          {"internalType":"string","name":"_tipo","type":"string"},
+          {"internalType":"string","name":"_uso","type":"string"},
+          {"internalType":"string","name":"_nr_serie","type":"string"},
+          {"internalType":"string","name":"_dataprod","type":"string"},
+          {"internalType":"string","name":"_lote","type":"string"}
+        ],
+        "name":"registrarBateria",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+      },
+      {
+        "inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],
+        "name":"removerBateria",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+      },
+      {
+        "inputs":[],
+        "name":"totalBaterias",
+        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+        "stateMutability":"view",
+        "type":"function"
+      }
+    ];
+
+    // ⚙️ Endereço do contrato
+    const contractAddress = "0x9816C8A5710D11ebF64ea5af286979AD766B107E";
+
+    let web3;
+    let contract;
+    let userAccount;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        contract = new web3.eth.Contract(ABI, contractAddress);
+        document.getElementById("wallet").innerText = "Carteira: " + userAccount;
+      } else {
+        alert("Instale a MetaMask!");
+      }
+    }
+
+    async function registrarBateria() {
+      const tipo = document.getElementById("tipo").value;
+      const uso = document.getElementById("uso").value;
+      const nr = document.getElementById("nr_serie").value;
+      const data = document.getElementById("dataprod").value;
+      const lote = document.getElementById("lote").value;
+
+      if (!tipo || !uso || !nr || !data || !lote) {
+        return alert("Preencha todos os campos!");
+      }
+
+      try {
+        await contract.methods.registrarBateria(tipo, uso, nr, data, lote).send({ from: userAccount });
+        alert("Bateria registrada com sucesso!");
+        listarBaterias();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao registrar bateria!");
+      }
+    }
+
+    async function verTotal() {
+      try {
+        const total = await contract.methods.totalBaterias().call();
+        document.getElementById("total").innerText = "Total de baterias: " + total;
+      } catch (err) {
+        console.error(err);
+        alert("Lista de baterias vazia!");
+      }
+    }
+
+    async function consultarBateria() {
+      const index = document.getElementById("index").value;
+      if (index === "") return alert("Informe o índice!");
+
+      try {
+        const b = await contract.methods.getBateria(index).call();
+        document.getElementById("bateria").innerHTML = `
+          <b>Tipo:</b> ${b[0]}<br>
+          <b>Uso:</b> ${b[1]}<br>
+          <b>Nº Série:</b> ${b[2]}<br>
+          <b>Data Produção:</b> ${b[3]}<br>
+          <b>Lote:</b> ${b[4]}
+        `;
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao consultar bateria!");
+      }
+    }
+
+    async function listarBaterias() {
+      try {
+        const lista = await contract.methods.listar().call();
+        if (lista.length === 0) {
+          document.getElementById("lista").innerText = "Nenhuma bateria registrada.";
+          return;
+        }
+
+        let html = `<table><tr><th>#</th><th>Tipo</th><th>Uso</th><th>Série</th><th>Data</th><th>Lote</th><th>Ação</th></tr>`;
+        lista.forEach((b, i) => {
+          html += `<tr>
+            <td>${i}</td>
+            <td>${b.tipo}</td>
+            <td>${b.uso}</td>
+            <td>${b.nr_serie}</td>
+            <td>${b.dataprod}</td>
+            <td>${b.lote}</td>
+            <td><button class="remove-btn" onclick="removerBateria(${i})">Remover</button></td>
+          </tr>`;
+        });
+        html += `</table>`;
+
+        document.getElementById("lista").innerHTML = html;
+      } catch (err) {
+        console.error(err);
+        alert("Lista de baterias vazia!");
+      }
+    }
+
+    async function removerBateria(index) {
+      if (!confirm("Tem certeza que deseja remover esta bateria?")) return;
+      try {
+        await contract.methods.removerBateria(index).send({ from: userAccount });
+        alert("Bateria removida com sucesso!");
+        listarBaterias();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao remover bateria!");
+      }
+    }
+  </script>
+</body>
+</html>
