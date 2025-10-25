@@ -1,0 +1,243 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_dataProd",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "registrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_dataProd",
+				"type": "string"
+			}
+		],
+		"name": "setDataProd",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "setLote",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_nr_serie",
+				"type": "string"
+			}
+		],
+		"name": "setNrSerie",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			}
+		],
+		"name": "setTipo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_uso",
+				"type": "string"
+			}
+		],
+		"name": "setUso",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "baterias",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataProd",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataProd",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "listar",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataProd",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct Baterias.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
