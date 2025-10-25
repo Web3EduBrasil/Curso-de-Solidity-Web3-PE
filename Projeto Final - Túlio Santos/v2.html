@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sistema de Registro de Baterias Defeituosas</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    /* --------------------------
+       ESTILO INSPIRADO EM MOURA
+       -------------------------- */
+
+    :root {
+      --azul-escuro: #0c1c40;
+      --amarelo-moura: #ffd200;
+      --cinza-fundo: #f4f6f9;
+      --branco: #ffffff;
+      --texto: #2e2e2e;
+      --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --radius: 10px;
+      --transicao: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background-color: var(--cinza-fundo);
+      color: var(--texto);
+      overflow-x: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--azul-escuro), #102b5a);
+      color: var(--branco);
+      padding: 25px 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: var(--sombra);
+      text-transform: uppercase;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: center;
+      background-color: var(--amarelo-moura);
+      padding: 12px 0;
+      box-shadow: var(--sombra);
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 40px;
+    }
+
+    .nav-link {
+      color: var(--azul-escuro);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 50px;
+      transition: var(--transicao);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: var(--azul-escuro);
+      color: var(--branco);
+    }
+
+    main {
+      padding: 60px 8%;
+      background-color: var(--cinza-fundo);
+      min-height: calc(100vh - 160px);
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      font-size: 1.9rem;
+      color: var(--azul-escuro);
+      margin-bottom: 25px;
+      border-left: 6px solid var(--amarelo-moura);
+      padding-left: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 35px; /* 🔹 Aumentado o espaçamento entre os campos */
+      margin-bottom: 45px; /* 🔹 Maior respiro entre seções */
+      background-color: var(--branco);
+      border-radius: var(--radius);
+      padding: 35px;
+      box-shadow: var(--sombra);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--azul-escuro);
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 1rem;
+      transition: var(--transicao);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--amarelo-moura);
+      box-shadow: 0 0 6px rgba(255, 210, 0, 0.5);
+      outline: none;
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--azul-escuro), #17376b);
+      color: var(--branco);
+      padding: 14px 32px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: var(--sombra);
+      transition: var(--transicao);
+      margin-top: 25px; /* 🔹 Espaço entre botões e campos */
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #17376b, var(--azul-escuro));
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 30px;
+      background-color: var(--branco);
+      border-radius: var(--radius);
+      box-shadow: var(--sombra);
+      padding: 25px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: linear-gradient(135deg, var(--azul-escuro), #102b5a);
+      color: var(--branco);
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody tr:hover {
+      background-color: rgba(255, 210, 0, 0.1);
+      transition: var(--transicao);
+    }
+
+    #totalBaterias {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      background-color: #f0f2f5;
+    }
+
+    .notificacao {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      color: var(--branco);
+      box-shadow: var(--sombra);
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transicao);
+      z-index: 9999;
+    }
+
+    .notificacao.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .notificacao.sucesso {
+      background-color: #4BB543;
+    }
+
+    .notificacao.erro {
+      background-color: #DC3545;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.6s ease;
+    }
+
+    footer {
+      text-align: center;
+      background-color: var(--azul-escuro);
+      color: var(--branco);
+      padding: 20px;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      box-shadow: var(--sombra);
+    }
+
+  </style>
+</head>
+<body>
+  <header>Sistema de Registro de Baterias Defeituosas</header>
+  <div class="navbar">
+    <div class="nav-menu">
+      <a href="#" class="nav-link active" onclick="mostrarSecao('registro')">Registrar Bateria</a>
+      <a href="#" class="nav-link" onclick="mostrarSecao('gerenciar')">Gerenciar Baterias</a>
+    </div>
+  </div>
+
+  <main>
+    <section id="registro" class="content-section active">
+      <h2>Registrar Nova Bateria Defeituosa</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tipo">Tipo de Bateria:</label>
+          <input id="tipo" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="uso">Tipo de Uso:</label>
+          <select id="uso">
+            <option value="Automotivo">Automotivo</option>
+            <option value="Estacionário">Estacionário</option>
+            <option value="Industrial">Industrial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="numeroSerie">Número de Série:</label>
+          <input id="numeroSerie" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="dataProducao">Data de Produção:</label>
+          <input id="dataProducao" type="date" />
+        </div>
+        <div class="form-group">
+          <label for="lote">Lote de Fabricação:</label>
+          <input id="lote" type="text" />
+        </div>
+      </div>
+      <button class="btn-submit" onclick="registrarBateria()">Registrar Bateria</button>
+    </section>
+
+    <section id="gerenciar" class="content-section">
+      <h2>Gerenciar Baterias</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="totalBaterias">Total de Baterias Registradas:</label>
+          <input id="totalBaterias" type="text" disabled />
+          <button class="btn-submit" onclick="atualizarTotal()">Atualizar</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="consultaId">ID da Bateria:</label>
+          <input id="consultaId" type="number" placeholder="Digite o ID" />
+          <button class="btn-submit" onclick="consultarPorId()">Consultar por ID</button>
+        </div>
+
+        <div class="form-group">
+          <label for="serialRemover">Serial para Remover:</label>
+          <input id="serialRemover" type="text" placeholder="Número de série" />
+          <button class="btn-submit" style="background: linear-gradient(135deg, #b32020, #8b0000);" onclick="removerPorSerial()">Remover</button>
+        </div>
+      </div>
+
+      <h2>Lista Completa de Baterias</h2>
+      <button class="btn-submit" onclick="listarBaterias()">Atualizar Lista</button>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nº de Série</th>
+              <th>Tipo</th>
+              <th>Uso</th>
+              <th>Lote</th>
+              <th>Data Produção</th>
+              <th>Data Registro</th>
+            </tr>
+          </thead>
+          <tbody id="lista"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 Moura EnergyTech — Todos os direitos reservados</footer>
+
+  <div id="notificacao" class="notificacao"></div>
+
+  <!-- JS original mantido -->
+   <script>
+    const abi = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "numeroSerie",
+				"type": "string"
+			}
+		],
+		"name": "BateriaRegistrada",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "baterias",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "numeroSerie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataProducao",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "numeroSerie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataProducao",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "listar",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "numeroSerie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataProducao",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasDefeituosas.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_numeroSerie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_dataProducao",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "registrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "removerBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+    ];
+    const enderecoContrato = "0x45771D29DE0eD1308Cc03C7bB74a23E31844D5A8";
+
+    let web3;
+    let contrato;
+
+    async function conectar() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        contrato = new web3.eth.Contract(abi, enderecoContrato);
+      } else {
+        mostrarNotificacao("erro", "MetaMask não detectado.");
+      }
+    }
+
+    async function registrarBateria() {
+      await conectar();
+      const tipo = document.getElementById("tipo").value;
+      const uso = document.getElementById("uso").value;
+      const numeroSerie = document.getElementById("numeroSerie").value;
+      const dataProducao = document.getElementById("dataProducao").value;
+      const lote = document.getElementById("lote").value;
+
+      const contas = await web3.eth.getAccounts();
+      try {
+        await contrato.methods.registrarBateria(tipo, uso, numeroSerie, dataProducao, lote)
+          .send({ from: contas[0] });
+        mostrarNotificacao("sucesso", "Bateria registrada com sucesso!");
+      } catch (err) {
+        console.error(err);
+        mostrarNotificacao("erro", "Erro ao registrar bateria.");
+      }
+    }
+
+    async function listarBaterias() {
+      await conectar();
+      const baterias = await contrato.methods.listar().call();
+      const lista = document.getElementById("lista");
+      lista.innerHTML = "";
+
+      baterias.forEach((bateria, index) => {
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${index}</td>
+          <td>${bateria.numeroSerie}</td>
+          <td>${bateria.tipo}</td>
+          <td>${bateria.uso}</td>
+          <td>${bateria.lote}</td>
+          <td>${bateria.dataProducao}</td>
+          <td>${new Date().toLocaleDateString("pt-BR")}</td>
+        `;
+        lista.appendChild(linha);
+      });
+    }
+
+    async function atualizarTotal() {
+      await conectar();
+      const baterias = await contrato.methods.listar().call();
+      document.getElementById("totalBaterias").value = baterias.length;
+    }
+
+    async function consultarPorId() {
+      await conectar();
+      const id = document.getElementById("consultaId").value;
+      try {
+        const b = await contrato.methods.getBateria(id).call();
+        mostrarNotificacao("sucesso", `ID ${id}: ${b.numeroSerie}, ${b.tipo}, ${b.uso}`);
+      } catch {
+        mostrarNotificacao("erro", "ID inválido ou não encontrado.");
+      }
+    }
+
+    async function removerPorSerial() {
+      await conectar();
+      const serial = document.getElementById("serialRemover").value;
+      const baterias = await contrato.methods.listar().call();
+      const contas = await web3.eth.getAccounts();
+
+      let removido = false;
+      for (let i = 0; i < baterias.length; i++) {
+        if (baterias[i].numeroSerie === serial) {
+          await contrato.methods.removerBateria(i).send({ from: contas[0] });
+          removido = true;
+          break;
+        }
+      }
+
+      if (removido) {
+        mostrarNotificacao("sucesso", `Bateria com serial ${serial} removida.`);
+        listarBaterias();
+      } else {
+        mostrarNotificacao("erro", "Serial não encontrado.");
+      }
+    }
+
+    function mostrarSecao(id) {
+      document.querySelectorAll(".content-section").forEach(secao => {
+        secao.classList.remove("active");
+      });
+      document.getElementById(id).classList.add("active");
+
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.classList.remove("active");
+      });
+      document.querySelector(`.nav-link[onclick="mostrarSecao('${id}')"]`).classList.add("active");
+    }
+
+    function mostrarNotificacao(tipo, mensagem) {
+      const notificacao = document.getElementById("notificacao");
+      notificacao.className = `notificacao show ${tipo}`;
+      notificacao.textContent = mensagem;
+      setTimeout(() => {
+        notificacao.className = "notificacao";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
