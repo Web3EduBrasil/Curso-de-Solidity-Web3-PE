@@ -1,117 +1,95 @@
-# <h1 align="center">MouraBateria Smart Contract (Solidity)</h1>
+# 🔋 Rastreabilidade Moura na Arbitrum: Segurança e UX de Próxima Geração
 
-![Badge em Desenvolvimento](https://img.shields.io/static/v1?label=STATUS&message=EM+DESENVOLVIMENTO&color=FFD700&style=for-the-badge)
+![Badge Status: MVP Estratégico](https://img.shields.io/static/v1?label=Status&message=MVP+Estratégico&color=FFD700&style=for-the-badge)
 
-## 🧾 Resumo do projeto
-Este projeto consiste no desenvolvimento e implantação de um **Smart Contract (Contrato Inteligente)** escrito em **Solidity**.  
-A aplicação, chamada `MouraBateria`, atua como um **registro descentralizado de baterias defeituosas** em uma **Blockchain de Camada 2 (L2)** compatível com a **EVM (Ethereum Virtual Machine)**, utilizando a **rede de teste Arbitrum Sepolia**.  
+## 💡 Proposta de Valor: Por Que Este Projeto?
 
-O objetivo principal é demonstrar o **ciclo completo de desenvolvimento Web3** — desde a criação do contrato em Solidity (com lógica de manipulação de arrays via padrão *Swap and Pop*) até a interação com o contrato por meio de uma **interface HTML/JavaScript**, utilizando **Ethers.js** e **MetaMask**.
+Este sistema demonstra como a **Blockchain Arbitrum (Layer 2)** pode revolucionar a rastreabilidade de ativos para a **Moura**, oferecendo **segurança imutável, transparência auditável** e uma **experiência de usuário (UX) superior**.
+
+Desenvolvido como um **Produto Mínimo Viável (MVP) robusto**, nosso foco foi entregar **valor imediato** (segurança e usabilidade) com uma **visão clara para a arquitetura V2 ideal**.
+
+### Nossa Abordagem Estratégica (MVP -> V2 Otimizada)
+
+| Pilar Estratégico | Solução Atual (MVP) | **Próxima Evolução (V2)** | Benefício Direto (Moura & Arbitrum) |
+| :---------------- | :------------------ | :------------------------ | :---------------------------------- |
+| **Integridade & Auditoria** | Array com índice mutável (`Swap-and-Pop`) | **`Mapping` + ID Permanente** | **Garante 100% de rastreabilidade imutável**, essencial para conformidade e controle de qualidade a longo prazo. |
+| **Segurança de Acesso** | **Controle `onlyOwner` implementado** | Gestão de Acesso Baseada em Papéis (`RBAC`) | **Protege os dados imediatamente**, superando soluções sem controle de acesso. |
+| **Usabilidade (UX)** | **Filtro Minimalista & Design Coeso** | Validações Avançadas & Notificações | **Facilita a adoção** pelos auditores e gestores da Moura, demonstrando o poder da Web3 de forma amigável. |
 
 ---
 
-## 🎨 Demonstração de Uso
+## ✨ Destaques do Projeto: Design & UX Focados no Usuário
+
+Acreditamos que a tecnologia blockchain deve simplificar, não complicar. Nossa interface foi desenhada para ser intuitiva e alinhada à excelência da marca Moura.
+
+-   **Filtro Inteligente e Discreto:** Diferente de interfaces poluídas, nosso filtro é acionado por um ícone minimalista, expandindo-se suavemente apenas quando necessário. Isso **maximiza a área útil** e **reduz a carga cognitiva** do usuário.
+-   **Feedback Claro e Imediato:** Utilizamos **Toast Notifications** modernas para confirmar ações ou alertar sobre erros, e **Modais de Confirmação** para operações críticas (como remoção), garantindo segurança e clareza.
+-   **Identidade Visual Moura:** Respeitamos a paleta de cores, tipografia e o profissionalismo associados à marca Moura.
+
+---
+
+## 🎬 Demonstração em Ação
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AbnerBarretto/MouraDesafio/main/assets/VideoDemonstracaoMoura.gif" alt="Demonstração do Fluxo de Uso" width="850">
+ <img src="https://raw.githubusercontent.com/AbnerBarretto/MouraDesafio/main/assets/VideoDemonstracaoMoura.gif" alt="Demonstração do Fluxo de Uso" width="850">
 </p>
-
-<p align="center"><em>Vídeo demonstrando o fluxo de Cadastro, Listagem e interação com o Smart Contract.</em></p>
-
----
-
-## 🔨 Funcionalidades do projeto
-
-- **Registro** descentralizado de baterias defeituosas (tipo, uso, número de série e lote).  
-- **Listagem** completa de todos os registros armazenados no contrato.  
-- **Remoção** otimizada de registros usando o padrão *Swap and Pop* para reduzir custo de gás.  
-- **Atualização** de dados de registros existentes.  
-- **Interação** com o contrato via frontend (HTML/JS) e carteira MetaMask.  
-- **Transparência** e imutabilidade dos dados garantidas pela Blockchain.
+<p align="center"><em>Demonstração do fluxo de conexão, cadastro, listagem e filtro interativo.</em></p>
 
 ---
 
-## 📁 Acesso ao projeto
+## ✅ Funcionalidades Essenciais Entregues (MVP)
 
-Você pode interagir com a aplicação diretamente pelo **deploy online** ou acessar o código-fonte:
-
-- **🔗 Aplicação Online (Vercel):** [Moura Bateria - Controle de Defeito](https://desafiomouraweb3.vercel.app/)  
-- **💻 Código Fonte (GitHub):** [Repositório MouraBateria](https://github.com/AbnerBarretto/MouraBateria)  
-- **⬇️ Baixar ZIP:** [Download do Projeto](https://github.com/AbnerBarretto/MouraBateria/archive/refs/heads/main.zip)
-
----
-
-## 🚀 Como Executar o Projeto Localmente
-
-1. **Clone ou baixe** o repositório.  
-2. **Abra o arquivo** `index.html` em seu navegador.  
-3. **Configure o MetaMask:** conecte sua carteira à **Rede de Teste Arbitrum Sepolia**.  
-4. **Interaja:** clique em “Conectar Carteira” e comece a registrar, atualizar e remover baterias defeituosas.  
-
-> 💡 **Nota:** O endereço do contrato já está configurado no `index.html`, apontando para a versão mais recente na Arbitrum Sepolia.  
-> Se desejar implantar uma nova versão, utilize o Remix IDE.
+-   **Registro Seguro:** Cadastro de baterias defeituosas na Arbitrum Sepolia, restrito ao proprietário (`onlyOwner`).
+-   **Auditoria Visual:** Listagem completa com métricas e **filtro dinâmico** por Número de Série e Tipo.
+-   **Gestão de Dados:** Funções para Atualizar e Remover registros (com otimização de Gas via *Swap-and-Pop*).
+-   **Integração Moderna:** Conexão fluida com MetaMask via **Ethers.js**.
 
 ---
 
-## ⚙️ Detalhes da Rede (Arbitrum Sepolia)
+## 🛠️ Detalhes Técnicos & Plataforma
 
-Se precisar adicionar manualmente a rede no MetaMask:
+-   **Smart Contract:** `MouraBateria` em **Solidity (^0.8.19)**.
+-   **Blockchain:** **Arbitrum Sepolia** (Layer 2 - Eficiência e Baixo Custo).
+-   **Frontend:** HTML5, CSS3, JavaScript ES6+.
+-   **Web3 Library:** **Ethers.js** (v5.7.2).
 
-| Parâmetro | Valor |
-| :--- | :--- |
-| **Network Name** | Arbitrum Sepolia |
-| **New RPC URL** | `https://sepolia-rollup.arbitrum.io/rpc` |
-| **Chain ID** | `421614` |
-| **Currency Symbol** | ETH |
-| **Block Explorer URL** | [https://sepolia.arbiscan.io/](https://sepolia.arbiscan.io/) |
+### Configuração da Rede Alvo
 
----
-
-## ✔️ Técnicas e Tecnologias Utilizadas
-
-- **Solidity** – Linguagem do Smart Contract  
-- **Ethereum / EVM** – Execução do contrato  
-- **Rede de Teste Arbitrum Sepolia**  
-- **Remix IDE** – Desenvolvimento e deploy  
-- **HTML / CSS / JavaScript** – Interface Web  
-- **Ethers.js** – Comunicação entre Frontend e Blockchain  
-- **MetaMask** – Carteira e gerenciamento de transações  
-- Padrão **“Swap and Pop”** – Otimização de remoção de elementos em arrays  
+| Parâmetro           | Valor                                       |
+| :------------------ | :------------------------------------------ |
+| **Network Name** | Arbitrum Sepolia                            |
+| **New RPC URL** | `https://sepolia-rollup.arbitrum.io/rpc`    |
+| **Chain ID** | `421614`                                    |
+| **Currency Symbol** | ETH                                         |
+| **Block Explorer** | [https://sepolia.arbiscan.io/](https://sepolia.arbiscan.io/) |
 
 ---
 
-![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
-![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+## 🌍 Acesso e Teste
+
+-   **🔗 Aplicação Online (Vercel):** [**Acesse a Demonstração Aqui**](https://moura-desafio-3w3j.vercel.app/)
+-   **💻 Código Fonte (GitHub):** [**Explore o Repositório**](https://github.com/AbnerBarretto/MouraDesafio)
 
 ---
 
-## 🚀 Próximos Passos e Otimizações Futuras (Roadmap)
+## 📈 Roadmap: Evolução para a Solução Definitiva
 
-Este projeto é um MVP funcional. Os seguintes recursos e otimizações estão planejados para a próxima fase de desenvolvimento:
+Reconhecemos que a arquitetura ideal requer otimizações. Nossos próximos passos planejados:
 
-### Smart Contract (Segurança e Eficiência)
+### Smart Contract V2 (Foco em Imutabilidade e Auditoria Avançada)
 
-- [ ] **Otimizar Armazenamento:** Migrar o array (`Bateria[]`) para um `mapping` com IDs permanentes para eliminar a fragilidade de índices causada pela função `removerBaterias`.
-- [ ] **Melhorar Rastreabilidade:** Adicionar `Events` em todas as funções de alteração de estado (`cadastrar`, `atualizar`, `remover`) para melhorar a auditoria e a comunicação com o Front-end.
+-   [ ] **Migrar para `Mapping`:** Substituir o `array` por um `mapping` com IDs únicos e permanentes, **eliminando a mutabilidade do índice** e garantindo 100% de integridade para auditoria.
+-   [ ] **Implementar `Events`:** Adicionar eventos Solidity para todas as operações de escrita, permitindo monitoramento off-chain e integração com sistemas de BI da Moura.
 
-### Front-end e Usabilidade (UX)
+### Melhorias de Front-end e Qualidade de Dados
 
-- [x] **Adicionar Filtros:** Implementar um campo de busca/filtro na seção de listagem por Número de Série, Lote ou Tipo de Bateria.
-- [ ] **Reforçar Validação:** Adicionar validações de formato (RegEx) para campos de entrada como "Número de Série" e "Lote de Fabricação", além de impedir o cadastro de datas futuras.
-- [ ] **Aviso de Rede:** Implementar uma verificação no JavaScript para notificar o usuário caso ele esteja conectado a uma rede diferente da Arbitrum Sepolia.
-
-### Design e Estética
-- [ ] Otimizar o design responsivo para tablets (telas entre 768px e 1024px).
+-   [ ] **Validação Robusta:** Implementar validações de formato (RegEx) nos campos de Série/Lote e checagem de datas para garantir a qualidade dos dados na origem.
 
 ---
 
-## 👨‍💻 Desenvolvedores
+## 👨‍💻 Equipe de Desenvolvimento
 
 Projeto desenvolvido por **Abner Barreto** e **João Henrique**.
 
 | [<img loading="lazy" src="https://github.com/AbnerBarretto.png" width=115><br><sub>Abner Barreto</sub>](https://github.com/AbnerBarretto) | [<img loading="lazy" src="https://github.com/lordpipoca.png" width=115><br><sub>João Henrique</sub>](https://github.com/lordpipoca) |
-| :---: | :---: |
+| :----------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: |
