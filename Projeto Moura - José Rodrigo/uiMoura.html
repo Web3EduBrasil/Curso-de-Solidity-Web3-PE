@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Blockchain | Moura Baterias Premium - ARBITRUM SEPOLIA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        /* Variáveis de Cores e Tipografia */
+        :root {
+            --moura-blue-dark: #004d99;      /* Azul Escuro (Principal) */
+            --moura-blue-medium: #0066cc;    /* Azul Médio (Detalhes) */
+            --moura-blue-light: #007bff;     /* Azul Claro (Botões/Ações) */
+            --moura-yellow: #ffcc00;         /* Amarelo (Destaque) */
+            --moura-white: #ffffff;
+            --moura-gray-text: #333333;
+            --moura-gray-bg: #f7f7f7;
+            --moura-card-bg: #ffffff;
+            --moura-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --moura-radius: 10px;
+        }
+
+        /* RESET e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--moura-gray-bg);
+            color: var(--moura-gray-text);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* HEADER & LOGO (Arrojado) */
+        header {
+            background-color: var(--moura-blue-dark);
+            color: var(--moura-white);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+        .logo-text {
+            color: var(--moura-white);
+            margin-left: 5px;
+        }
+        .logo-symbol {
+            font-size: 2.2em;
+            color: var(--moura-yellow);
+        }
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .chain-info {
+            background-color: var(--moura-blue-medium);
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        /* BOTÃO CONEXÃO METAMASK NO HEADER */
+        #connect-button {
+            background-color: var(--moura-yellow);
+            color: var(--moura-blue-dark);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+        #connect-button:hover:not(:disabled) {
+            background-color: #ffd740;
+        }
+        #connect-button:disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: default;
+        }
+
+        /* STATUS WEB3 */
+        #status {
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: var(--moura-radius);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .status-default {
+            background-color: #e6f2ff;
+            color: var(--moura-blue-medium);
+        }
+        .status-error {
+            background-color: #ffe0e0;
+            color: #cc0000;
+        }
+        .status-success {
+            background-color: #e6ffe6;
+            color: #008000;
+        }
+
+        /* LAYOUT PRINCIPAL (GRID) */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* CARD (Seções) */
+        .card {
+            background-color: var(--moura-card-bg);
+            padding: 30px;
+            border-radius: var(--moura-radius);
+            box-shadow: var(--moura-shadow);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            color: var(--moura-blue-dark);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--moura-yellow);
+        }
+
+        /* FORMULÁRIO (Inputs) */
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--moura-gray-text);
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: var(--moura-blue-light);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        .enum-note {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* BOTÕES DE AÇÃO */
+        button:not(#connect-button) {
+            background-color: var(--moura-blue-light);
+            color: var(--moura-white);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        button.action-small:not(#connect-button) {
+            width: auto;
+            margin-top: 10px;
+        }
+        button:not(#connect-button):hover {
+            background-color: var(--moura-blue-medium);
+            transform: translateY(-1px);
+        }
+        button:not(#connect-button):active {
+            transform: translateY(0);
+        }
+
+        /* RESULTADOS/OUTPUT */
+        .results-section {
+            grid-column: 1 / 3;
+        }
+        #output {
+            background-color: var(--moura-gray-bg);
+            padding: 20px;
+            border-radius: var(--moura-radius);
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            font-size: 0.95em;
+            border-left: 4px solid var(--moura-blue-medium);
+        }
+        .output-title {
+            color: var(--moura-blue-dark);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* Adaptação para telas menores */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .results-section {
+                grid-column: 1 / 2;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-symbol">⚡</span>
+                <span class="logo-text">MOURA BATERIAS</span>
+            </div>
+            
+            <div class="header-info">
+                <div class="chain-info">
+                    Arbitrum Sepolia (Teste)
+                </div>
+                <button id="connect-button" onclick="connectWallet()">
+                    Conectar MetaMask
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="status" class="status-default">Aguardando conexão do MetaMask...</div>
+
+        <div class="main-grid">
+
+            <div class="card">
+                <h2><span style="color: var(--moura-yellow);">1.</span> Registrar Nova Bateria Defeituosa</h2>
+                
+                <label for="regTipo">Tipo da Bateria:</label>
+                <input type="text" id="regTipo" placeholder="Ex: Moura Silver, Heliar Power" required>
+
+                <label for="regUso">Uso:</label>
+                <select id="regUso" required>
+                    <option value="0">Automotivo</option>
+                    <option value="1">Náutico</option>
+                    <option value="2">Industrial</option>
+                </select>
+                <p class="enum-note">Tipo de uso (Enum: 0=Automotivo, 1=Náutico, 2=Industrial).</p>
+
+                <label for="regSerie">Número de Série (Chave Única):</label>
+                <input type="text" id="regSerie" placeholder="Ex: M84T19342A" required>
+
+                <label for="regDataProd">Data de Produção (Timestamp UNIX):</label>
+                <input type="number" id="regDataProd" placeholder="Ex: 1672531200" required>
+                
+                <label for="regLote">Lote de Produção:</label>
+                <input type="text" id="regLote" placeholder="Ex: LOTE202405" required>
+
+                <button onclick="registrarBateria()">REGISTRAR NA BLOCKCHAIN</button>
+            </div>
+
+            <div class="action-cards">
+                
+                <div class="card">
+                    <h2><span style="color: var(--moura-yellow);">2.</span> Consultar por Série</h2>
+                    <label for="querySerie">Número de Série:</label>
+                    <input type="text" id="querySerie" placeholder="Insira o Número de Série">
+                    <button class="action-small" onclick="recuperarBateriaPorSerie()">BUSCAR DETALHES</button>
+                </div>
+
+                <div class="card">
+                    <h2><span style="color: var(--moura-yellow);">3.</span> Lista de Registros</h2>
+                    <p>Recupera todos os identificadores (Números de Série) armazenados no contrato.</p>
+                    <button class="action-small" onclick="listarSeries()">LISTAR TODAS AS SÉRIES</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section card">
+            <h2><span style="color: var(--moura-yellow);">Log</span> e Resultados</h2>
+            <div id="output"><span class="output-title">Aguardando interação...</span></div>
+        </div>
+
+    </div>
+
+    <script>
+        const CONTRACT_ADDRESS = "0xF2582897b73346F8989760DbFd5CeAA2eDD545d6"; 
+        
+        // --- CONFIGURAÇÃO PERSONALIZADA DO USUÁRIO ---
+        const ARBITRUM_SEPOLIA_CHAIN_ID_CUSTOM = 421614; 
+        const ARBITRUM_SEPOLIA_RPC = 'https://sepolia-rollup.arbitrum.io/rpc';
+        
+        const CONTRACT_ABI = [
+            { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "string", "name": "numeroDeSerie", "type": "string" }, { "indexed": false, "internalType": "string", "name": "tipo", "type": "string" }, { "indexed": true, "internalType": "enum RegistroBateriasMoura.UsoBateria", "name": "uso", "type": "uint8" }], "name": "BateriaRegistrada", "type": "event" },
+            { "inputs": [{ "internalType": "string", "name": "_tipo", "type": "string" }, { "internalType": "enum RegistroBateriasMoura.UsoBateria", "name": "_uso", "type": "uint8" }, { "internalType": "string", "name": "_numeroDeSerie", "type": "string" }, { "internalType": "uint256", "name": "_dataProd", "type": "uint256" }, { "internalType": "string", "name": "_lote", "type": "string" }], "name": "registrarBateria", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+            { "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "name": "baterias", "outputs": [{ "internalType": "string", "name": "tipo", "type": "string" }, { "internalType": "enum RegistroBateriasMoura.UsoBateria", "name": "uso", "type": "uint8" }, { "internalType": "string", "name": "numeroDeSerie", "type": "string" }, { "internalType": "uint256", "name": "dataProd", "type": "uint256" }, { "internalType": "string", "name": "lote", "type": "string" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [{ "internalType": "enum RegistroBateriasMoura.UsoBateria", "name": "_uso", "type": "uint8" }], "name": "getUsoAsString", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "pure", "type": "function" },
+            { "inputs": [], "name": "listarSeries", "outputs": [{ "internalType": "string[]", "name": "", "type": "string[]" }], "stateMutability": "view", "type": "function" },
+            { "inputs": [{ "internalType": "string", "name": "_numeroDeSerie", "type": "string" }], "name": "recuperarBateriaPorSerie", "outputs": [{ "internalType": "string", "name": "tipo", "type": "string" }, { "internalType": "enum RegistroBateriasMoura.UsoBateria", "name": "uso", "type": "uint8" }, { "internalType": "string", "name": "numeroDeSerie", "type": "string" }, { "internalType": "uint256", "name": "dataProd", "type": "uint256" }, { "internalType": "string", "name": "lote", "type": "string" }], "stateMutability": "view", "type": "function" }
+        ];
+
+        const outputDiv = document.getElementById('output');
+        const statusDiv = document.getElementById('status');
+        const connectButton = document.getElementById('connect-button');
+        let provider, signer, contract;
+
+        const USO_MAP = { 0: "Automotivo", 1: "Náutico", 2: "Industrial" };
+
+        function setOutput(message, isError = false) {
+            outputDiv.className = isError ? 'status-error' : 'status-default';
+            outputDiv.innerHTML = `<span class="output-title">${isError ? '❌ ERRO' : '✅ LOG'}</span>\n${message}`;
+        }
+
+        function updateConnectButton(isConnected, address = '') {
+            if (isConnected) {
+                connectButton.innerText = `Conectado: ${address.substring(0, 6)}...`;
+                connectButton.disabled = true;
+            } else {
+                connectButton.innerText = 'Conectar MetaMask';
+                connectButton.disabled = false;
+            }
+        }
+
+        // --- FUNÇÃO PARA TENTAR TROCAR OU ADICIONAR A REDE ---
+        async function switchNetwork() {
+            if (!window.ethereum) return;
+            
+            const hexChainId = '0x' + ARBITRUM_SEPOLIA_CHAIN_ID_CUSTOM.toString(16);
+
+            try {
+                // 1. Tentar trocar para a rede diretamente
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: hexChainId }],
+                });
+            } catch (switchError) {
+                // 4902 significa que a rede não foi adicionada ao MetaMask
+                if (switchError.code === 4902) {
+                    try {
+                        // 2. Tentar adicionar a rede
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: hexChainId,
+                                    chainName: 'Arbitrum Sepolia (Moura)',
+                                    rpcUrls: [ARBITRUM_SEPOLIA_RPC],
+                                    nativeCurrency: {
+                                        name: 'ETH',
+                                        symbol: 'ETH',
+                                        decimals: 18,
+                                    },
+                                    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+                                },
+                            ],
+                        });
+                    } catch (addError) {
+                        throw new Error(`Falha ao adicionar a rede (código ${addError.code}).`);
+                    }
+                } else {
+                    // Outro erro de switch (e.g., usuário rejeitou)
+                    throw new Error(switchError.message || "Falha ao trocar de rede. Tente manualmente.");
+                }
+            }
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                statusDiv.className = 'status-error';
+                statusDiv.innerHTML = '⚠️ **Erro:** Metamask não detectada. Instale para prosseguir.';
+                updateConnectButton(false);
+                return;
+            }
+
+            statusDiv.className = 'status-default';
+            statusDiv.innerHTML = 'Solicitando conexão e verificando rede no MetaMask...';
+            updateConnectButton(false);
+
+            try {
+                // 1. Solicita a conexão de contas
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                // 2. Força a troca ou adição da rede com seu Chain ID personalizado (421614)
+                await switchNetwork();
+
+                // 3. Configura o provedor e verifica a rede novamente
+                provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                await checkNetwork();
+
+                // Adiciona listeners para mudanças
+                window.ethereum.on('accountsChanged', () => {
+                    window.location.reload(); 
+                });
+                window.ethereum.on('chainChanged', () => {
+                    window.location.reload(); 
+                });
+
+
+            } catch (error) {
+                console.error("Erro ao conectar/trocar rede:", error);
+                statusDiv.className = 'status-error';
+                statusDiv.innerHTML = `❌ **Erro de Conexão:** ${error.message || 'Falha ao conectar. Verifique o console.'}`;
+                updateConnectButton(false);
+            }
+        }
+
+        async function checkNetwork() {
+            if (!provider) return;
+
+            const { chainId } = await provider.getNetwork();
+            
+            if (chainId !== ARBITRUM_SEPOLIA_CHAIN_ID_CUSTOM) {
+                statusDiv.className = 'status-error';
+                statusDiv.innerHTML = `🚨 **Erro:** Você está na rede errada. ID esperado: ${ARBITRUM_SEPOLIA_CHAIN_ID_CUSTOM}. Clique em "Conectar MetaMask" para tentar trocar novamente.`;
+                updateConnectButton(false);
+                return;
+            }
+
+            // Conexão bem-sucedida e rede correta
+            signer = provider.getSigner();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            const address = await signer.getAddress();
+            
+            statusDiv.className = 'status-success';
+            statusDiv.innerHTML = `✅ **Conectado!** Rede: Arbitrum Sepolia. Endereço: ${address}`;
+            updateConnectButton(true, address);
+        }
+
+        // Funções de Contrato:
+        async function registrarBateria() {
+            if (!contract) return setOutput("Contrato não inicializado. Clique em Conectar MetaMask.", true);
+
+            const tipo = document.getElementById('regTipo').value;
+            const uso = parseInt(document.getElementById('regUso').value);
+            const serie = document.getElementById('regSerie').value;
+            const dataProd = document.getElementById('regDataProd').value;
+            const lote = document.getElementById('regLote').value;
+
+            if (!tipo || isNaN(uso) || !serie || !dataProd || !lote) {
+                return setOutput("Por favor, preencha todos os campos do registro.", true);
+            }
+
+            setOutput(`Enviando transação para registrar a bateria ${serie}... (Aguarde o MetaMask)`, false);
+            
+            try {
+                const tx = await contract.registrarBateria(tipo, uso, serie, dataProd, lote);
+                setOutput(`Transação enviada! Hash: ${tx.hash}\nStatus: Aguardando mineração...`, false);
+                
+                await tx.wait();
+
+                setOutput(`
+🎉 REGISTRO CONCLUÍDO COM SUCESSO!
+-------------------------------------
+Série: ${serie}
+Tipo: ${tipo}
+Uso: ${USO_MAP[uso]}
+Lote: ${lote}
+
+Detalhes da Transação:
+Hash: ${tx.hash}
+`, false);
+
+            } catch (error) {
+                console.error("Erro ao registrar bateria:", error);
+                setOutput(`❌ Erro na Transação: ${error.reason || error.message || "Erro desconhecido."}`, true);
+            }
+        }
+
+        async function recuperarBateriaPorSerie() {
+            // Usando um provider público para leitura
+            const readProvider = provider || new ethers.providers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
+            const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
+            
+            const serie = document.getElementById('querySerie').value;
+            if (!serie) return setOutput("Por favor, insira o número de série para consultar.", true);
+
+            setOutput(`Consultando bateria com série ${serie}...`, false);
+
+            try {
+                const result = await readContract.recuperarBateriaPorSerie(serie);
+                
+                const dataProdBig = result.dataProd.toNumber();
+                const dataProdDate = new Date(dataProdBig * 1000);
+                const formattedDate = dataProdDate.toLocaleDateString("pt-BR", { year: 'numeric', month: '2-digit', day: '2-digit' }) + " " + dataProdDate.toLocaleTimeString("pt-BR");
+
+                outputDiv.className = 'status-success';
+                outputDiv.innerHTML = `
+                <span class="output-title">DETALHES DA BATERIA (VIEW)</span>
+                -------------------------------------
+                TIPO:            ${result.tipo}
+                USO:             ${USO_MAP[result.uso]}
+                Nº DE SÉRIE:     ${result.numeroDeSerie}
+                LOTE:            ${result.lote}
+                DATA PRODUÇÃO:   ${formattedDate} (Timestamp: ${dataProdBig.toString()})
+                `;
+
+            } catch (error) {
+                console.error("Erro ao consultar bateria:", error);
+                setOutput(`❌ Erro na Consulta: Número de série '${serie}' não encontrado.`, true);
+            }
+        }
+
+        async function listarSeries() {
+            // Usando um provider público para leitura
+            const readProvider = provider || new ethers.providers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
+            const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
+
+            setOutput("Listando todos os números de série registrados...", false);
+
+            try {
+                const series = await readContract.listarSeries();
+
+                if (series.length === 0) {
+                    outputDiv.className = 'status-default';
+                    outputDiv.innerHTML = `<span class="output-title">LISTAGEM DE SÉRIES</span>\nNenhuma bateria registrada até o momento.`;
+                } else {
+                    outputDiv.className = 'status-success';
+                    outputDiv.innerHTML = `
+<span class="output-title">📋 ${series.length} SÉRIES REGISTRADAS:</span>
+----------------------------------------------
+${series.join('\n')}
+                    `;
+                }
+            } catch (error) {
+                console.error("Erro ao listar séries:", error);
+                setOutput(`❌ Erro ao Listar: ${error.message}`, true);
+            }
+        }
+
+        // Lógica de inicialização para não conectar automaticamente, mas verificar o MetaMask
+        window.onload = () => {
+             if (typeof window.ethereum !== 'undefined') {
+                statusDiv.innerHTML = 'MetaMask detectado. Clique em "Conectar MetaMask" para iniciar.';
+                // Tentativa silenciosa de re-conexão para usuários que já aprovaram
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) {
+                        connectWallet();
+                    }
+                });
+            } else {
+                statusDiv.className = 'status-error';
+                statusDiv.innerHTML = '⚠️ **Erro:** Metamask não detectada. Não é possível conectar.';
+                connectButton.disabled = true;
+            }
+        };
+    </script>
+
+</body>
+</html>
