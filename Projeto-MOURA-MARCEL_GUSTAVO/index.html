@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baterias Moura — DApp Interativa</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <style>
+    :root{
+      --moura-blue:#004a91;
+      --moura-yellow:#ffd100;
+      --muted:#6b7280;
+      --card:#f8fafc;
+      --glass: rgba(255,255,255,0.06);
+      --radius:14px;
+      --accent:#0b74ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+      background:linear-gradient(180deg, #031730 0%, #002a5c 60%);
+      color:#0b2036;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:24px;
+      align-items:start;
+    }
+
+    header.appHeader{
+      grid-column:1/3;
+      display:flex;
+      align-items:center;
+      gap:18px;
+      margin-bottom:8px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;color:white;
+    }
+    .brand img{height:52px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.35)}
+    .brand h1{font-size:20px;margin:0;font-weight:700}
+    .brand p{margin:0;font-size:12px;color:rgba(255,255,255,0.85)}
+
+    main.card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+      padding:22px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(2,6,23,0.5);
+    }
+
+    aside.panel{
+      background:transparent;border-radius:var(--radius);padding:18px;color:white;
+    }
+
+    .walletBox{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .btn{
+      display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:700
+    }
+    .btn-primary{background:var(--moura-yellow);color:var(--moura-blue)}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.9)}
+
+    .account{background:rgba(255,255,255,0.06);padding:10px;border-radius:10px;display:flex;gap:10px;align-items:center}
+    .account small{display:block;color:rgba(255,255,255,0.75)}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:13px;margin-bottom:6px;color:#0b2036;font-weight:600}
+    input[type=text], input[type=number], input[type=date], select{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #e6e9ef;background:transparent;font-size:14px
+    }
+
+    .formRow{margin-bottom:12px}
+    .muted{color:var(--muted);font-size:13px}
+
+    .cardsList{display:flex;flex-direction:column;gap:12px;max-height:420px;overflow:auto;padding-right:6px}
+    .bCard{background:var(--card);padding:12px;border-radius:12px;border-left:6px solid var(--moura-blue);box-shadow:0 4px 14px rgba(2,6,23,0.06)}
+
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    .status{margin-top:12px;padding:10px;border-radius:10px;font-weight:700;display:none}
+    .status.ok{display:block;background:#e6f7ec;color:#1b8748}
+    .status.err{display:block;background:#fde9e9;color:#b32b2b}
+    .loader{height:36px;width:36px;border-radius:50%;border:4px solid #e6eef9;border-top-color:var(--moura-blue);animation:spin 1s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #f1f4f8;text-align:left}
+    th{font-size:13px;color:var(--muted)}
+
+    .searchBar{display:flex;gap:8px;align-items:center}
+    .searchBar input{flex:1}
+
+    .small{font-size:13px}
+
+    footer.note{grid-column:1/3;margin-top:8px;color:rgba(255,255,255,0.7);text-align:center}
+
+    /* responsive */
+    @media(max-width:980px){
+      .wrap{grid-template-columns:1fr;}
+      aside.panel{order:2}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="appHeader">
+      <div class="brand">
+        <img src="nova-marca-moura-2.jpg" alt="Moura">
+        <div>
+          <h1>Baterias Moura — DApp</h1>
+          <p>Registro público de baterias — rede Ethereum (teste)</p>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div class="account" id="accountBox">
+          <div>
+            <div id="accountLabel" style="font-weight:700;color:#ffffff">Carteira: não conectada</div>
+            <small id="networkLabel" class="muted">Rede: não detectada</small>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="connectButton"><i class="fas fa-wallet"></i> Conectar</button>
+      </div>
+    </header>
+
+    <main class="card" role="main">
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 style="margin:0">Cadastro de Bateria</h2>
+          <div class="muted small">Transações feitas pela sua carteira</div>
+        </div>
+
+        <form id="bateriaForm" onsubmit="return false;" style="margin-top:12px">
+          <div class="grid-2">
+            <div>
+              <div class="formRow"><label for="tipo">Tipo</label><input id="tipo" type="text" placeholder="Automotiva / Estacionária" required></div>
+              <div class="formRow"><label for="uso">Uso</label><input id="uso" type="text" placeholder="Carro, Moto, UPS..." required></div>
+              <div class="formRow"><label for="numeroSerie">Número de Série</label><input id="numeroSerie" type="text" placeholder="SN12345678" required></div>
+            </div>
+            <div>
+              <div class="formRow"><label for="dataProd">Data de Produção</label><input id="dataProd" type="date" required></div>
+              <div class="formRow"><label for="lote">Lote</label><input id="lote" type="text" placeholder="Lote ou Código" required></div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button id="addButton" class="btn btn-primary" type="button"><i class="fas fa-save"></i> Cadastrar</button>
+                <button id="clearBtn" class="btn btn-ghost" type="button"><i class="fas fa-eraser"></i> Limpar</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div id="txStatus" class="status"></div>
+
+        <hr style="border:none;border-top:1px solid #eef3fb;margin:18px 0">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <h3 style="margin:0">Consultar por índice</h3>
+          <div class="searchBar" style="width:420px">
+            <input id="indexInput" type="number" placeholder="Índice da bateria (ex: 0)" min="0">
+            <button id="getButton" class="btn btn-ghost"><i class="fas fa-search"></i> Buscar</button>
+          </div>
+        </div>
+
+        <div id="bateriaInfo" style="margin-top:12px"></div>
+
+        <hr style="border:none;border-top:1px solid #eef3fb;margin:18px 0">
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0">Todas as baterias</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="muted small">Total: <span id="totalBaterias">0</span></div>
+            <button id="listarButton" class="btn btn-ghost"><i class="fas fa-sync-alt"></i> Atualizar</button>
+          </div>
+        </div>
+
+        <div id="listaBaterias" class="cardsList" style="margin-top:12px"></div>
+
+      </section>
+    </main>
+
+    <aside class="panel">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:700">Informações</div>
+              <div class="muted small">Contrado: <span id="contractAddressShort">-</span></div>
+            </div>
+            <div style="text-align:right">
+              <div class="muted small">Network</div>
+              <div id="chainId" style="font-weight:700">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px">
+          <div style="font-weight:700;margin-bottom:8px">Ações rápidas</div>
+          <div class="actions">
+            <button id="copyAddr" class="btn btn-ghost" title="Copiar endereço do contrato"><i class="fas fa-copy"></i> Copiar</button>
+            <button id="openEtherscan" class="btn btn-ghost"><i class="fas fa-external-link-alt"></i> Etherscan</button>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px">
+          <div style="font-weight:700;margin-bottom:8px">Dicas</div>
+          <div class="muted small">Use uma conta de teste em redes de desenvolvimento. As transações demoram alguns segundos — sempre verifique no MetaMask.</div>
+        </div>
+      </div>
+    </aside>
+
+    <footer class="note">Desenvolvido para demonstração — nunca envie chaves privadas. Adaptável a sua stack.</footer>
+  </div>
+
+  <script>
+    // Configurações do contrato (mesma que você passou)
+    const contractAddress = "0x3b98c8D0A09bf663eC8CE0d458810eA5402A89aF";
+    const contractABI = [
+      {"inputs":[{"internalType":"string","name":"_tipo","type":"string"},{"internalType":"string","name":"_uso","type":"string"},{"internalType":"string","name":"_numeroSerie","type":"string"},{"internalType":"string","name":"_dataProd","type":"string"},{"internalType":"string","name":"_lote","type":"string"}],"name":"adicionarBateria","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"uint256","name":"_index","type":"uint256"}],"name":"getBateria","outputs":[{"internalType":"string","name":"tipo","type":"string"},{"internalType":"string","name":"uso","type":"string"},{"internalType":"string","name":"numeroSerie","type":"string"},{"internalType":"string","name":"dataProd","type":"string"},{"internalType":"string","name":"lote","type":"string"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"listar","outputs":[{"components":[{"internalType":"string","name":"tipo","type":"string"},{"internalType":"string","name":"uso","type":"string"},{"internalType":"string","name":"numeroSerie","type":"string"},{"internalType":"string","name":"dataProd","type":"string"},{"internalType":"string","name":"lote","type":"string"}],"internalType":"struct BateriasDefeituosasMoura.Bateria[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"totalBaterias","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+    ];
+
+    // Elementos
+    const connectButton = document.getElementById('connectButton');
+    const accountLabel = document.getElementById('accountLabel');
+    const networkLabel = document.getElementById('networkLabel');
+    const contractAddressShort = document.getElementById('contractAddressShort');
+    const chainIdLabel = document.getElementById('chainId');
+    const addButton = document.getElementById('addButton');
+    const listarButton = document.getElementById('listarButton');
+    const getButton = document.getElementById('getButton');
+    const copyAddr = document.getElementById('copyAddr');
+    const openEtherscan = document.getElementById('openEtherscan');
+    const txStatus = document.getElementById('txStatus');
+
+    let web3;
+    let contract;
+    let userAccount;
+
+    function short(addr){ if(!addr) return '-'; return addr.substring(0,6)+"..."+addr.substring(addr.length-4); }
+
+    function showStatus(text, ok=true){ txStatus.textContent = text; txStatus.className = ok? 'status ok' : 'status err'; }
+
+    // Inicializa visual com endereço
+    contractAddressShort.textContent = short(contractAddress);
+
+    // Connect wallet
+    connectButton.addEventListener('click', async ()=>{
+      if(window.ethereum){
+        try{
+          web3 = new Web3(window.ethereum);
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          userAccount = accounts[0];
+          accountLabel.textContent = 'Carteira: ' + short(userAccount);
+          contract = new web3.eth.Contract(contractABI, contractAddress);
+          connectButton.disabled = true; connectButton.textContent = 'Conectado';
+          const chainId = await web3.eth.getChainId();
+          chainIdLabel.textContent = chainId;
+          networkLabel.textContent = 'Rede: ChainID ' + chainId;
+          showStatus('✅ MetaMask conectado — pronto para operações.', true);
+          updateTotal();
+        }catch(err){
+          console.error(err); showStatus('Erro ao conectar: '+(err.message||err), false);
+        }
+      } else {
+        alert('MetaMask não detectado — instale a extensão!');
+      }
+    });
+
+    // Copiar endereço do contrato
+    copyAddr.addEventListener('click', ()=>{
+      navigator.clipboard.writeText(contractAddress).then(()=>{
+        showStatus('Endereço do contrato copiado para área de transferência.', true);
+      });
+    });
+
+    openEtherscan.addEventListener('click', ()=>{
+      // Abre etherscan em chain default (ethereum mainnet) — ajuste se usar testnet
+      const url = `https://etherscan.io/address/${contractAddress}`;
+      window.open(url, '_blank');
+    });
+
+    // Limpar
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      ['tipo','uso','numeroSerie','dataProd','lote'].forEach(id=>document.getElementById(id).value='');
+      showStatus('Campos limpos.', true);
+    });
+
+    // Adicionar bateria
+    addButton.addEventListener('click', async ()=>{
+      if(!contract || !userAccount) return alert('Conecte sua carteira primeiro');
+      const tipo = document.getElementById('tipo').value.trim();
+      const uso = document.getElementById('uso').value.trim();
+      const numeroSerie = document.getElementById('numeroSerie').value.trim();
+      const dataProdEl = document.getElementById('dataProd');
+      const dataProd = dataProdEl.value ? new Date(dataProdEl.value).toLocaleDateString('pt-BR') : '';
+      const lote = document.getElementById('lote').value.trim();
+      if(!tipo||!uso||!numeroSerie||!dataProd||!lote) return showStatus('Preencha todos os campos antes de enviar.', false);
+
+      try{
+        showStatus('Enviando transação — confirme na MetaMask...');
+        addButton.disabled = true; addButton.innerHTML = '<span class="loader"></span> Enviando...';
+        const gas = await contract.methods.adicionarBateria(tipo, uso, numeroSerie, dataProd, lote).estimateGas({from:userAccount});
+        const resp = await contract.methods.adicionarBateria(tipo, uso, numeroSerie, dataProd, lote).send({from:userAccount, gas});
+        console.log('tx', resp);
+        showStatus('✅ Bateria cadastrada. Tx: ' + (resp.transactionHash||'—'), true);
+        // limpar
+        ['tipo','uso','numeroSerie','dataProd','lote'].forEach(id=>document.getElementById(id).value='');
+        updateTotal();
+      }catch(err){
+        console.error(err);
+        showStatus('Falha na transação: ' + (err.message||err), false);
+      }finally{
+        addButton.disabled = false; addButton.innerHTML = '<i class="fas fa-save"></i> Cadastrar';
+      }
+    });
+
+    // Buscar por índice
+    getButton.addEventListener('click', async ()=>{
+      const idx = document.getElementById('indexInput').value;
+      if(idx === '' || idx === null) return showStatus('Insira um índice válido.', false);
+      if(!contract) return showStatus('Conecte sua carteira primeiro.', false);
+      try{
+        showStatus('Buscando...');
+        const res = await contract.methods.getBateria(idx).call();
+        if(!res || !res.numeroSerie){
+          document.getElementById('bateriaInfo').innerHTML = '<div class="muted">Nenhuma bateria para esse índice.</div>';
+          showStatus('Índice vazio ou não encontrado.', false);
+          return;
+        }
+        document.getElementById('bateriaInfo').innerHTML = `
+          <div class="bCard">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>#${idx}</strong> <div class="small muted">${res.tipo} — ${res.uso}</div></div>
+              <div style="text-align:right"><div class="small muted">Nº Série</div><div style="font-weight:700">${res.numeroSerie}</div></div>
+            </div>
+            <div style="margin-top:8px" class="small">Produção: ${res.dataProd} • Lote: ${res.lote}</div>
+          </div>
+        `;
+        showStatus('✅ Bateria encontrada', true);
+      }catch(err){
+        console.error(err);
+        showStatus('Erro ao consultar índice: ' + (err.message||err), false);
+      }
+    });
+
+    // Listar todas
+    listarButton.addEventListener('click', updateList);
+
+    async function updateTotal(){
+      if(!contract) return;
+      try{
+        const tot = await contract.methods.totalBaterias().call();
+        document.getElementById('totalBaterias').textContent = tot;
+      }catch(err){console.warn(err)}
+    }
+
+    async function updateList(){
+      if(!contract) return showStatus('Conecte para listar.', false);
+      try{
+        showStatus('Carregando lista...');
+        const baterias = await contract.methods.listar().call();
+        const listDiv = document.getElementById('listaBaterias');
+        listDiv.innerHTML = '';
+        if(!baterias || baterias.length === 0){
+          listDiv.innerHTML = '<div class="muted">Nenhuma bateria cadastrada.</div>';
+          showStatus('Lista atualizada — 0 registros.', true);
+          document.getElementById('totalBaterias').textContent = 0;
+          return;
+        }
+        baterias.forEach((b,i)=>{
+          const el = document.createElement('div');
+          el.className = 'bCard';
+          el.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>#${i}</strong><div class="small muted">${b.tipo} • ${b.uso}</div></div>
+              <div style="text-align:right"><div class="small muted">Nº Série</div><div style="font-weight:700">${b.numeroSerie}</div></div>
+            </div>
+            <div style="margin-top:8px" class="small muted">Produção: ${b.dataProd} • Lote: ${b.lote}</div>
+          `;
+          listDiv.appendChild(el);
+        });
+        document.getElementById('totalBaterias').textContent = baterias.length;
+        showStatus('📋 Listagem atualizada. Total: ' + baterias.length, true);
+      }catch(err){
+        console.error(err);
+        showStatus('Erro ao listar baterias: ' + (err.message||err), false);
+      }
+    }
+
+    // Auto-update if user already connected
+    (async function init(){
+      if(window.ethereum && window.ethereum.selectedAddress){
+        // tenta reconectar
+        try{
+          web3 = new Web3(window.ethereum);
+          const accounts = await web3.eth.getAccounts();
+          if(accounts && accounts[0]){
+            userAccount = accounts[0];
+            accountLabel.textContent = 'Carteira: ' + short(userAccount);
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+            const chainId = await web3.eth.getChainId();
+            chainIdLabel.textContent = chainId;
+            networkLabel.textContent = 'Rede: ChainID ' + chainId;
+            connectButton.disabled = true; connectButton.textContent = 'Conectado';
+            updateTotal();
+          }
+        }catch(e){/* ignore */}
+      }
+
+      // detecta mudança de conta/rede
+      if(window.ethereum){
+        window.ethereum.on('accountsChanged', (accounts)=>{
+          if(accounts.length==0){
+            accountLabel.textContent = 'Carteira: não conectada';
+            connectButton.disabled=false;connectButton.textContent='Conectar';
+            contract=null;userAccount=null;showStatus('Conta desconectada.', false);
+          }else{
+            userAccount = accounts[0];accountLabel.textContent = 'Carteira: '+short(userAccount);showStatus('Conta alterada.', true);
+          }
+        });
+        window.ethereum.on('chainChanged', (chainId)=>{
+          chainIdLabel.textContent = parseInt(chainId,16);
+          networkLabel.textContent = 'Rede: ChainID ' + parseInt(chainId,16);
+          showStatus('Rede alterada para ' + parseInt(chainId,16), true);
+        });
+      }
+    })();
+
+  </script>
+</body>
+</html>
