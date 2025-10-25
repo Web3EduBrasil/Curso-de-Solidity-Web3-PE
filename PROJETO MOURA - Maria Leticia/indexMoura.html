@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moura Battery Management | Blockchain DApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Updated fonts to Space Grotesk, Work Sans, and Fira Code for more professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Updated to match official Moura website colors - richer, more saturated blue */
+            --bg-primary: #001a33;
+            --bg-secondary: #002447;
+            --bg-card: #003366;
+            --bg-card-hover: #004080;
+            --border-color: #0066B3;
+            --moura-blue: #537fca;
+            --moura-blue-rich: #0047AB;
+            --moura-yellow: #FDB913;
+            --moura-blue-dark: #002d7a;
+            --moura-blue-light: #3399cc;
+            --moura-yellow-dark: #d99b00;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            /* Updated font family to Work Sans */
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Added hero section styles */
+        .hero-section {
+            /* Updated to richer blue gradient matching official Moura site */
+            background: linear-gradient(135deg, var(--moura-blue-rich) 0%, var(--moura-blue-dark) 100%);
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            border-bottom: 4px solid var(--moura-yellow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Added blockchain network pattern overlay like official site */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(253, 185, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 102, 179, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h2 {
+            /* Updated font family to Space Grotesk for headings */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+        }
+
+        .hero-features {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--moura-yellow);
+            font-weight: 600;
+        }
+
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-image img {
+            max-width: 200%;
+            height: 400px;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Added features section styles */
+        .features-section {
+            margin: 4rem 0;
+        }
+
+        .section-title {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--moura-blue);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            /* Updated to dark card background */
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--moura-yellow);
+            background: var(--bg-card-hover);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(253, 185, 19, 0.3);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--moura-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+            color: var(--moura-blue);
+        }
+
+        .feature-card h3 {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            color: var(--moura-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Added how it works section styles */
+        .how-it-works-section {
+            /* Updated to dark card background */
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--moura-blue);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--moura-yellow);
+        }
+
+        .step h4 {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            color: var(--moura-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+        }
+
+        /* Added battery showcase section */
+        .battery-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin: 4rem 0;
+            padding: 3rem;
+            /* Updated to dark card background */
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue);
+            border-radius: 24px;
+        }
+
+        .battery-showcase-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .battery-showcase-image img {
+            max-width: 500%;
+            height: 350px;
+            filter: drop-shadow(0 10px 30px rgba(0, 102, 179, 0.2));
+        }
+
+        .battery-showcase-content h3 {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            color: var(--moura-blue);
+            margin-bottom: 1rem;
+        }
+
+        .battery-showcase-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .battery-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .spec-item {
+            padding: 1rem;
+            /* Updated to dark secondary background */
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--moura-yellow);
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .spec-value {
+            font-size: 1.125rem;
+            color: var(--moura-blue);
+            font-weight: 700;
+        }
+
+        header {
+            background: #003DA5;
+            border-bottom: 3px solid var(--moura-yellow);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 102, 179, 0.2);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: var(--moura-yellow);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--moura-blue);
+            box-shadow: 0 4px 12px rgba(253, 185, 19, 0.4);
+        }
+
+        /* Updated logo to use image */
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        h1 {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.9);
+            /* Updated font family to Fira Code */
+            font-family: 'Fira Code', monospace;
+        }
+
+        .wallet-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            /* Updated to dark card background with light text */
+            background: var(--bg-card);
+            border: 2px solid var(--moura-yellow);
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--moura-yellow);
+            box-shadow: 0 0 10px var(--moura-yellow);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--moura-yellow);
+            color: var(--moura-blue);
+            box-shadow: 0 4px 12px rgba(253, 185, 19, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--moura-yellow-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(253, 185, 19, 0.5);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--moura-blue);
+            border: 2px solid var(--moura-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--moura-blue);
+            color: #ffffff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            /* Updated to dark card background */
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 102, 179, 0.2);
+        }
+
+        .stat-card:hover {
+            border-color: var(--moura-yellow);
+            background: var(--bg-card-hover);
+            box-shadow: 0 8px 24px rgba(253, 185, 19, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--moura-blue);
+        }
+
+        .stat-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            /* Updated font family to Fira Code */
+            font-family: 'Fira Code', monospace;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            /* Updated card background to richer blue */
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue-rich);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 61, 165, 0.3);
+        }
+
+        .card-title {
+            /* Updated font family to Space Grotesk */
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #537fca;
+        }
+
+        .card-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--moura-yellow);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--moura-blue);
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #537fca;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            /* Updated to dark input background with light text */
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--moura-yellow);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(253, 185, 19, 0.2);
+        }
+
+        input:disabled, select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 3px solid #003DA5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: #003DA5;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            border-bottom: 3px solid var(--moura-yellow);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+            /* Updated to dark row background */
+            background: var(--bg-card);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-primary {
+            background: var(--moura-blue);
+            color: #ffffff;
+            border: none;
+        }
+
+        .badge-success {
+            background: var(--moura-yellow);
+            color: var(--moura-blue);
+            border: none;
+        }
+
+        .code {
+            /* Updated font family to Fira Code */
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--moura-yellow);
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: var(--moura-yellow);
+            border: 3px solid var(--moura-blue);
+            color: var(--moura-blue);
+        }
+
+        .alert-error {
+            background: var(--error);
+            border: 3px solid #dc2626;
+            color: #ffffff;
+        }
+
+        .spinner {
+            border: 2px solid rgba(0, 102, 179, 0.2);
+            border-top-color: var(--moura-blue);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Added footer styles */
+        footer {
+            background: #003DA5;
+            color: #ffffff;
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+            border-top: 4px solid var(--moura-yellow);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--moura-yellow);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        /* Added responsive styles for new sections */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-features {
+                justify-content: center;
+            }
+
+            .battery-showcase {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .hero-text h2 {
+                font-size: 2rem;
+            }
+
+            .hero-text p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wallet-section {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .table-container {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+
+            .battery-specs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Updated to dark overlay */
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--moura-yellow);
+            border-top-color: var(--moura-blue);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .loading-content p {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Added filter controls styling */
+        .filter-section {
+            background: var(--bg-card);
+            border: 3px solid var(--moura-blue-rich);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--moura-yellow);
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .btn-filter {
+            padding: 0.75rem 1.5rem;
+            background: var(--moura-yellow);
+            color: var(--moura-blue);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            background: var(--moura-yellow-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Added batch prefix selector styling */
+        .batch-input-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 0.5rem;
+        }
+
+        .batch-prefix-select {
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--moura-yellow);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .origin-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--moura-yellow);
+            color: var(--moura-blue);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Processando transação...</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <!-- Added Moura logo image -->
+                <div class="logo">
+                    <h1>M</h1>
+                </div>
+                <div>
+                    <h1>Moura Battery Management</h1>
+                    <p class="subtitle">Blockchain-Powered Tracking System</p>
+                </div>
+            </div>
+            <div class="wallet-section">
+                <div class="wallet-status" id="walletStatus">
+                    <span class="status-dot"></span>
+                    <span id="walletAddress">Não conectado</span>
+                </div>
+                <button class="btn btn-primary" id="connectButton" onclick="connectWallet()">
+                    Conectar Carteira
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Added hero section with battery image -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h2>Gestão Inteligente de Baterias com Blockchain</h2>
+                <p>Rastreabilidade completa, transparência total e segurança garantida pela tecnologia blockchain Ethereum.</p>
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <span>✓</span>
+                        <span>100% Rastreável</span>
+                    </div>
+                    <div class="hero-feature">
+                        <span>✓</span>
+                        <span>Imutável</span>
+                    </div>
+                    <div class="hero-feature">
+                        <span>✓</span>
+                        <span>Descentralizado</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- Updated to use new battery image -->
+                <img src="Moura-2.png" alt="Bateria Moura">
+            </div>
+        </div>
+    </section>
+
+    <!-- Added features section -->
+    <div class="container">
+        <section class="features-section">
+            <h2 class="section-title">Por Que Blockchain?</h2>
+            <p class="section-subtitle">Tecnologia de ponta para garantir a integridade dos seus dados</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Segurança Máxima</h3>
+                    <p>Dados criptografados e protegidos pela rede Ethereum, impossíveis de serem alterados ou falsificados.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Rastreabilidade Total</h3>
+                    <p>Histórico completo de cada bateria desde a produção até o descarte, registrado permanentemente.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Transparência</h3>
+                    <p>Todos os registros são públicos e verificáveis, garantindo confiança e conformidade regulatória.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Descentralização</h3>
+                    <p>Sem ponto único de falha. Seus dados estão distribuídos e sempre disponíveis na rede blockchain.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Added how it works section -->
+        <section class="how-it-works-section">
+            <h2 class="section-title">Como Funciona</h2>
+            <p class="section-subtitle">Processo simples e seguro em 4 etapas</p>
+            
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Conecte sua Carteira</h4>
+                    <p>Use MetaMask para conectar-se à rede Ethereum de forma segura</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Registre a Bateria</h4>
+                    <p>Insira os dados da bateria defeituosa no formulário</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Confirme no Blockchain</h4>
+                    <p>Aprove a transação e aguarde a confirmação na rede</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h4>Acompanhe em Tempo Real</h4>
+                    <p>Visualize e gerencie todas as baterias registradas</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Added battery showcase section -->
+        <section class="battery-showcase">
+            <div class="battery-showcase-image">
+                <!-- Updated to use new battery image -->
+                <img src="boladona-removebg-preview.png" alt="Bateria Moura Premium">
+            </div>
+            <div class="battery-showcase-content">
+                <h3>Baterias Moura: Qualidade e Inovação</h3>
+                <p>Há mais de 60 anos, a Moura é líder em tecnologia de baterias automotivas no Brasil. Agora, unimos nossa expertise com a tecnologia blockchain para oferecer o mais avançado sistema de gestão e rastreabilidade do mercado.</p>
+                
+                <div class="battery-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Tecnologia</div>
+                        <div class="spec-value">Blockchain</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Rede</div>
+                        <div class="spec-value">Ethereum</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Segurança</div>
+                        <div class="spec-value">Máxima</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Rastreamento</div>
+                        <div class="spec-value">100%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="alertSuccess" class="alert alert-success">
+            <span>✓</span>
+            <span id="alertSuccessMessage"></span>
+        </div>
+
+        <div id="alertError" class="alert alert-error">
+            <span>✗</span>
+            <span id="alertErrorMessage"></span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total de Baterias</div>
+                <div class="stat-value" id="totalBatteries">0</div>
+                <div class="stat-info">Registradas no blockchain</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Status da Rede</div>
+                <div class="stat-value" id="networkStatus">—</div>
+                <div class="stat-info">Ethereum Network</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Contrato Inteligente</div>
+                <div class="stat-value">✓</div>
+                <div class="stat-info code" id="contractAddress">Não conectado</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="card-icon">+</span>
+                    Registrar Bateria
+                </h2>
+                <form id="batteryForm" onsubmit="registerBattery(event)">
+                    <div class="form-group">
+                        <label for="batteryType">Tipo de Bateria</label>
+                        <select id="batteryType" required disabled>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Automotiva">Automotiva</option>
+                            <option value="Estacionária">Estacionária</option>
+                            <option value="Tracionária">Tracionária</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usageType">Tipo de Uso</label>
+                        <select id="usageType" required disabled>
+                            <option value="">Selecione o uso</option>
+                            <option value="Veicular">Veicular</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Residencial">Residencial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="serialNumber">Número de Série</label>
+                        <input type="text" id="serialNumber" placeholder="Ex: MRA-2024-001" required disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productionDate">Data de Produção</label>
+                        <input type="date" id="productionDate" required disabled>
+                    </div>
+
+                    <!-- Added batch prefix selector and automatic origin detection -->
+                    <div class="form-group">
+                        <label for="batchPrefix">Origem do Lote (Primeiros 2 Dígitos)</label>
+                        <select id="batchPrefix" class="batch-prefix-select" required disabled onchange="updateOrigin()">
+                            <option value="">Selecione a origem</option>
+                            <option value="01">01 - BJ-UN1</option>
+                            <option value="02">02 - BJ-UN10</option>
+                            <option value="06">06 - SP</option>
+                            <option value="07">07 - AG</option>
+                        </select>
+                        <div id="originDisplay" style="display: none;">
+                            <span class="origin-badge" id="originBadge"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="batchNumber">Número do Lote Completo</label>
+                        <input type="text" id="batchNumber" placeholder="Ex: 01-LOTE-2024-A" required disabled>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="registerButton" disabled>
+                        <span id="registerButtonText">Registrar no Blockchain</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="card-icon">⚡</span>
+                    Baterias Registradas
+                </h2>
+                
+                <!-- Added filter section for battery list -->
+                <div class="filter-section">
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label for="filterOrigin">Filtrar por Origem</label>
+                            <select id="filterOrigin" onchange="filterBatteries()">
+                                <option value="">Todas as origens</option>
+                                <option value="BJ-UN1">BJ-UN1</option>
+                                <option value="BJ-UN10">BJ-UN10</option>
+                                <option value="SP">SP</option>
+                                <option value="AG">AG</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterBatch">Filtrar por Lote</label>
+                            <input type="text" id="filterBatch" placeholder="Digite o número do lote" onkeyup="filterBatteries()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterDate">Filtrar por Data</label>
+                            <input type="date" id="filterDate" onchange="filterBatteries()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="btn-filter" onclick="clearFilters()">Limpar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Uso</th>
+                                <th>Série</th>
+                                <th>Data Prod.</th>
+                                <th>Lote</th>
+                                <th>Origem</th>
+                                <th>Data Inclusão</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batteryTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                    Conecte sua carteira para visualizar as baterias
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added footer section -->
+    <footer>
+        <div class="footer-content">
+            <p><strong>Moura Battery Management System</strong></p>
+            <p>Sistema de gestão de baterias defeituosas com tecnologia blockchain</p>
+            <div class="footer-links">
+                <a href="#">Sobre</a>
+                <a href="#">Documentação</a>
+                <a href="#">Suporte</a>
+                <a href="#">Contato</a>
+            </div>
+            <p style="font-size: 0.875rem; opacity: 0.8;">© 2025 Moura. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    const contractAddress = "0x7daf316D08464668bD3979cbd8D35d55BF7AA9c6";
+    const contractABI = [
+    { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+    { 
+        "inputs": [
+        { "internalType": "string", "name": "tipo", "type": "string" },
+        { "internalType": "string", "name": "uso", "type": "string" },
+        { "internalType": "string", "name": "nr_serie", "type": "string" },
+        { "internalType": "string", "name": "dataprod", "type": "string" },
+        { "internalType": "string", "name": "lote", "type": "string" },
+        { "internalType": "string", "name": "dataInclusao", "type": "string" }
+        ],
+        "name": "cadastrarBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { 
+        "inputs": [], 
+        "name": "dono", 
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }], 
+        "stateMutability": "view", 
+        "type": "function" 
+    },
+    { 
+        "inputs": [], 
+        "name": "listarBaterias", 
+        "outputs": [{
+        "components": [
+            { "internalType": "string", "name": "tipo", "type": "string" },
+            { "internalType": "string", "name": "uso", "type": "string" },
+            { "internalType": "string", "name": "nr_serie", "type": "string" },
+            { "internalType": "string", "name": "dataprod", "type": "string" },
+            { "internalType": "string", "name": "lote", "type": "string" },
+            { "internalType": "string", "name": "dataInclusao", "type": "string" }
+        ],
+        "internalType": "struct BateriasDefeituosas.Bateria[]",
+        "name": "",
+        "type": "tuple[]"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    { 
+        "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+        "name": "removerBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+    ];
+
+
+        let provider;
+        let signer;
+        let contract;
+        let userAccount;
+        let allBatteries = [];
+
+        function getOriginFromBatchPrefix(prefix) {
+            const originMap = {
+                '01': 'BJ-UN1',
+                '02': 'BJ-UN10',
+                '06': 'SP',
+                '07': 'AG'
+            };
+            return originMap[prefix] || 'Desconhecida';
+        }
+
+        function updateOrigin() {
+            const prefix = document.getElementById('batchPrefix').value;
+            const originDisplay = document.getElementById('originDisplay');
+            const originBadge = document.getElementById('originBadge');
+            
+            if (prefix) {
+                const origin = getOriginFromBatchPrefix(prefix);
+                originBadge.textContent = `Origem: ${origin}`;
+                originDisplay.style.display = 'block';
+                
+                // Auto-fill batch number with prefix
+                const batchInput = document.getElementById('batchNumber');
+                if (!batchInput.value.startsWith(prefix)) {
+                    batchInput.value = prefix + '-';
+                }
+            } else {
+                originDisplay.style.display = 'none';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function getCurrentTimestamp() {
+            return new Date().toISOString();
+        }
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showError('MetaMask não está instalado! Por favor, instale a extensão MetaMask.');
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                const network = await provider.getNetwork();
+                
+                document.getElementById('walletAddress').textContent = 
+                    userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+                document.getElementById('networkStatus').textContent = network.name;
+                document.getElementById('contractAddress').textContent = 
+                    contractAddress.substring(0, 10) + '...' + contractAddress.substring(34);
+                
+                document.getElementById('connectButton').textContent = 'Conectado';
+                document.getElementById('connectButton').disabled = true;
+                
+                enableForm();
+                await loadBatteries();
+                showSuccess('Carteira conectada com sucesso!');
+
+            } catch (error) {
+                console.error('Erro ao conectar carteira:', error);
+                showError('Erro ao conectar carteira: ' + error.message);
+            }
+        }
+
+        function enableForm() {
+            document.getElementById('batteryType').disabled = false;
+            document.getElementById('usageType').disabled = false;
+            document.getElementById('serialNumber').disabled = false;
+            document.getElementById('productionDate').disabled = false;
+            document.getElementById('batchPrefix').disabled = false;
+            document.getElementById('batchNumber').disabled = false;
+            document.getElementById('registerButton').disabled = false;
+        }
+
+        async function registerBattery(event) {
+        event.preventDefault();
+
+        const batteryType = document.getElementById('batteryType').value;
+        const usageType = document.getElementById('usageType').value;
+        const serialNumber = document.getElementById('serialNumber').value;
+        const productionDate = document.getElementById('productionDate').value;
+        const batchNumber = document.getElementById('batchNumber').value;
+        const batchPrefix = document.getElementById('batchPrefix').value;
+
+        if (!batchNumber.startsWith(batchPrefix)) {
+            showError('O número do lote deve começar com o prefixo selecionado: ' + batchPrefix);
+            return;
+        }
+
+        const dataInclusao = new Date().toISOString(); // <-- ADICIONE ESTA LINHA
+
+        try {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('registerButton').disabled = true;
+            document.getElementById('registerButtonText').innerHTML =
+                '<span class="spinner"></span> Processando...';
+
+            // Agora passando 6 argumentos:
+            const tx = await contract.cadastrarBateria(
+                batteryType,
+                usageType,
+                serialNumber,
+                productionDate,
+                batchNumber,
+                dataInclusao // <-- E ESTA LINHA AQUI
+            );
+
+            await tx.wait();
+
+            document.getElementById('batteryForm').reset();
+            document.getElementById('originDisplay').style.display = 'none';
+            await loadBatteries();
+            showSuccess('Bateria registrada com sucesso no blockchain!');
+
+        } catch (error) {
+            console.error('Erro ao registrar bateria:', error);
+            showError('Erro ao registrar bateria: ' + error.message);
+        } finally {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('registerButton').disabled = false;
+            document.getElementById('registerButtonText').textContent = 'Registrar no Blockchain';
+        }
+    }
+
+
+async function loadBatteries() {
+            try {
+                // 1. Busca as baterias do contrato
+                const batteries = await contract.listarBaterias(); 
+
+                // 2. CORREÇÃO: Mapeia os dados CORRETOS do contrato para o array 'allBatteries'
+                allBatteries = batteries.map((battery, index) => ({
+                    id: index,                          // O ID é o ÍNDICE do array
+                    tipoBateria: battery.tipo,          // Nome corrigido (era tipoBateria)
+                    tipoUso: battery.uso,               // Nome corrigido (era tipoUso)
+                    numeroSerie: battery.nr_serie,      // Nome corrigido (era numeroSerie)
+                    dataProducao: battery.dataprod,     // Nome corrigido (era dataProducao)
+                    numeroLote: battery.lote,           // Nome corrigido (era numeroLote)
+                    origem: getOriginFromBatchPrefix(battery.lote.substring(0, 2)), // Correto, baseado no 'lote'
+                    dataInclusao: battery.dataInclusao  // Nome corrigido (lendo do contrato)
+                }));
+                
+                // 3. Atualiza o contador e exibe as baterias
+                document.getElementById('totalBatteries').textContent = allBatteries.length; 
+                displayBatteries(allBatteries); 
+
+            } catch (error) {
+                console.error('Erro ao carregar baterias:', error);
+                showError('Erro ao carregar baterias: ' + error.message); 
+            }
+        }
+
+        function displayBatteries(batteries) {
+            const tableBody = document.getElementById('batteryTableBody');
+            tableBody.innerHTML = '';
+
+            if (batteries.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            Nenhuma bateria encontrada
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            batteries.forEach(battery => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="badge badge-primary">#${battery.id}</span></td>
+                    <td>${battery.tipoBateria}</td>
+                    <td><span class="badge badge-success">${battery.tipoUso}</span></td>
+                    <td class="code">${battery.numeroSerie}</td>
+                    <td>${formatDate(battery.dataProducao)}</td>
+                    <td class="code">${battery.numeroLote}</td>
+                    <td><span class="badge badge-success">${battery.origem}</span></td>
+                    <td>${formatDate(battery.dataInclusao)}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.75rem;" 
+                                onclick="removeBattery(${battery.id})">
+                            Remover
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterBatteries() {
+            const filterOrigin = document.getElementById('filterOrigin').value.toLowerCase();
+            const filterBatch = document.getElementById('filterBatch').value.toLowerCase();
+            const filterDate = document.getElementById('filterDate').value;
+
+            const filtered = allBatteries.filter(battery => {
+                const matchOrigin = !filterOrigin || battery.origem.toLowerCase().includes(filterOrigin);
+                const matchBatch = !filterBatch || battery.numeroLote.toLowerCase().includes(filterBatch);
+                const matchDate = !filterDate || battery.dataProducao === filterDate;
+                
+                return matchOrigin && matchBatch && matchDate;
+            });
+
+            displayBatteries(filtered);
+        }
+
+        function clearFilters() {
+            document.getElementById('filterOrigin').value = '';
+            document.getElementById('filterBatch').value = '';
+            document.getElementById('filterDate').value = '';
+            displayBatteries(allBatteries);
+        }
+
+        async function removeBattery(id) {
+            if (!confirm('Tem certeza que deseja remover esta bateria do registro?')) {
+                return;
+            }
+
+            try {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                const tx = await contract.removerBateria(id);
+                await tx.wait();
+
+                await loadBatteries();
+                showSuccess('Bateria removida com sucesso!');
+
+            } catch (error) {
+                console.error('Erro ao remover bateria:', error);
+                showError('Erro ao remover bateria: ' + error.message);
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('alertSuccess');
+            document.getElementById('alertSuccessMessage').textContent = message;
+            alert.style.display = 'flex';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('alertError');
+            document.getElementById('alertErrorMessage').textContent = message;
+            alert.style.display = 'flex';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    location.reload();
+                } else {
+                    connectWallet();
+                }
+            });
+
+            window.ethereum.on('chainChanged', function () {
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

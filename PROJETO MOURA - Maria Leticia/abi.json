@@ -1,0 +1,116 @@
+[
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataInclusao",
+				"type": "string"
+			}
+		],
+		"name": "cadastrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dono",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "listarBaterias",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataInclusao",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasDefeituosas.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "removerBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
