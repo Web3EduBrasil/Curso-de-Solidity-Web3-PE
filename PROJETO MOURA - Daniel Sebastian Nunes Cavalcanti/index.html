@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<title>Interface Baterias</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+  <h1>Interface Baterias</h1>
+
+  <div class="container">
+    <h2>Consultar Bateria por ID</h2>
+    <div class="form-group">
+      <input type="number" id="inputId" placeholder="ID da bateria" />
+    </div>
+    <button id="consultarBtn">Consultar</button>
+    <div id="resultado"></div>
+  </div>
+
+  <div class="container">
+    <h2>Filtrar Baterias</h2>
+    <p>Selecione os parâmetros que deseja usar para o filtro:</p>
+    <div id="filtro-selecao" class="form-group-checkbox">
+      <label><input type="checkbox" name="filtro" value="Tipo"> Tipo</label>
+      <label><input type="checkbox" name="filtro" value="Uso"> Uso</label>
+      <label><input type="checkbox" name="filtro" value="NrSerie"> Nº Série</label>
+      <label><input type="checkbox" name="filtro" value="DataProd"> Data Produção</label>
+      <label><input type="checkbox" name="filtro" value="Lote"> Lote</label>
+    </div>
+    <div class="form-group" id="filtro-inputs">
+      <!-- Inputs serão inseridos aqui pelo JavaScript -->
+    </div>
+    <div class="button-group">
+      <button id="filtrarBtn">Filtrar</button>
+      <button id="limparFiltroBtn" class="secondary">Limpar Filtros</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Lista de Baterias</h2>
+    <button id="listarBtn">Listar todas</button>
+    <div id="lista"></div>
+  </div>
+
+  <div class="container">
+    <h2>Adicionar Nova Bateria</h2>
+    <div class="form-group">
+      <input type="text" id="tipo" placeholder="Tipo" />
+      <input type="text" id="uso" placeholder="Uso" />
+      <input type="number" id="nr_serie" placeholder="Nº Série" />
+      <input type="text" id="dataprod" placeholder="Data produção" />
+      <input type="text" id="lote" placeholder="Lote" />
+    </div>
+    <button id="adicionarBtn">Adicionar</button>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
