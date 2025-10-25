@@ -1,3 +1,4 @@
+//Mateus Omar
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -55,4 +56,5 @@ contract BateriasDefeituosasMoura {
     function totalBaterias() public view returns (uint) {
         return baterias.length;
     }
+
 }
