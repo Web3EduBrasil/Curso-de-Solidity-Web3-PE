@@ -67,7 +67,7 @@ Acreditamos que a tecnologia blockchain deve simplificar, não complicar. Nossa 
 
 ## 🌍 Acesso e Teste
 
--   **🔗 Aplicação Online (Vercel):** [**Acesse a Demonstração Aqui**](https://moura-desafio-3w3j.vercel.app/)
+-   **🔗 Aplicação Online (Vercel):** [**Acesse a Demonstração Aqui**](https://desafiomouraweb3.vercel.app/)
 -   **💻 Código Fonte (GitHub):** [**Explore o Repositório**](https://github.com/AbnerBarretto/MouraDesafio)
 
 ---
