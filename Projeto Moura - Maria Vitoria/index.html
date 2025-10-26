@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DApp - Baterias Moura Defeituosas</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /*
+     * ----------------------------------------------------
+     * REINÍCIO E TIPOGRAFIA
+     * ----------------------------------------------------
+     */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      /* Inter com fallback moderno */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f0f2f5; /* Fundo levemente mais cinza */
+      color: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: #0b2e59;
+      font-size: 2rem; /* Levemente maior */
+      margin-bottom: 30px;
+      letter-spacing: 0; /* Removendo o letter-spacing, a fonte Inter já é limpa */
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /*
+     * ----------------------------------------------------
+     * CONTAINER PRINCIPAL
+     * ----------------------------------------------------
+     */
+    .container {
+      display: flex;
+      gap: 30px; /* Reduzi levemente o gap para maior compactação */
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1050px; /* Levemente maior */
+      width: 100%;
+    }
+
+    /*
+     * ----------------------------------------------------
+     * FORMULÁRIO E INPUTS
+     * ----------------------------------------------------
+     */
+    form {
+      background: #ffffff;
+      padding: 30px; /* Mais padding */
+      border-radius: 16px; /* Borda mais arredondada */
+      /* Sombra mais suave e moderna */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f0f0f0; /* Borda sutil */
+      width: 100%;
+      max-width: 420px; /* Levemente mais largo */
+      transition: all 0.3s ease;
+    }
+
+    form:hover {
+      /* Sombra ligeiramente mais pronunciada no hover */
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 20px; /* Mais espaço acima do label */
+      color: #3f51b5; /* Cor levemente mais vibrante para destaque */
+      font-size: 0.9rem;
+      text-transform: uppercase; /* Deixando o label em maiúsculas */
+      letter-spacing: 0.5px;
+    }
+
+    label:first-child {
+      margin-top: 0; /* Removendo margem do primeiro label */
+    }
+
+    input {
+      width: 100%;
+      padding: 12px; /* Mais padding interno */
+      border-radius: 10px; /* Borda do input mais arredondada */
+      border: 1px solid #e0e6ed;
+      margin-top: 8px; /* Mais espaço abaixo do label */
+      font-size: 1rem;
+      color: #495057;
+      background-color: #f9f9f9; /* Fundo suave */
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1b3b6f;
+      /* Sombra de foco mais sutil */
+      box-shadow: 0 0 0 3px rgba(27, 59, 111, 0.2);
+      background-color: #fff; /* Fundo branco ao focar */
+    }
+
+    /*
+     * ----------------------------------------------------
+     * BOTÕES
+     * ----------------------------------------------------
+     */
+    button {
+      width: 100%;
+      margin-top: 25px; /* Mais espaço acima do botão */
+      padding: 12px 15px; /* Mais padding */
+      background-color: #1b3b6f;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px; /* Mais arredondado */
+      cursor: pointer;
+      font-size: 1.05rem; /* Levemente maior */
+      transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s;
+      box-shadow: 0 4px 10px rgba(27, 59, 111, 0.3); /* Sombra para o botão primário */
+    }
+
+    button:hover {
+      background-color: #254a8a;
+      box-shadow: 0 6px 15px rgba(27, 59, 111, 0.4);
+    }
+
+    button:active {
+      transform: scale(0.99); /* Reduzi a escala para ser mais sutil */
+      box-shadow: 0 2px 5px rgba(27, 59, 111, 0.3); /* Sombra de clique */
+    }
+
+    /* BOTÃO SECUNDÁRIO */
+    .secundario {
+      background: #fff;
+      color: #1b3b6f;
+      border: 2px solid #1b3b6f; /* Borda um pouco mais grossa */
+      margin-top: 15px;
+      box-shadow: none; /* Sem sombra no botão secundário */
+    }
+
+    .secundario:hover {
+      background-color: #1b3b6f;
+      color: white;
+      box-shadow: none;
+    }
+
+    /*
+     * ----------------------------------------------------
+     * LISTA DE BATERIAS
+     * ----------------------------------------------------
+     */
+    #lista {
+      flex: 1;
+      background: white;
+      border-radius: 16px; /* Borda mais arredondada */
+      padding: 30px; /* Mais padding */
+      /* Sombra mais suave e moderna */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+      min-width: 450px; /* Levemente mais largo */
+      transition: all 0.3s ease;
+      max-height: 600px;
+      overflow-y: auto;
+      border: 1px solid #f0f0f0; /* Borda sutil */
+    }
+
+    #lista h3 {
+      color: #0b2e59;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .bateria {
+      border-bottom: 1px dashed #e0e0e0; /* Linha tracejada mais suave */
+      padding: 15px 0; /* Mais padding */
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .bateria:last-child {
+      border-bottom: none;
+    }
+
+    .bateria strong {
+      color: #0b2e59; /* Cor principal no número */
+      font-weight: 700;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    /*
+     * ----------------------------------------------------
+     * RESPONSIVO
+     * ----------------------------------------------------
+     */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+
+      form {
+          max-width: 100%; /* Permite que o formulário ocupe toda a largura no mobile */
+      }
+
+      #lista {
+        width: 100%;
+        min-width: unset; /* Remove o min-width para mobile */
+        max-width: 420px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Registro de Baterias Moura Defeituosas 🔋</h1>
+
+  <div class="container">
+    <form id="formBateria">
+      <label for="tipoUso">Tipo de Uso</label>
+      <input type="text" id="tipoUso" placeholder="Ex: automotivo, náutico ou industrial" required>
+
+      <label for="numeroSerie">Número de Série</label>
+      <input type="text" id="numeroSerie" placeholder="0000000000" required>
+
+      <label for="dataProducao">Data de Produção</label>
+      <input type="text" id="dataProducao" placeholder="DD/MM/AAAA" required>
+
+      <label for="lote">Lote</label>
+      <input type="text" id="lote" placeholder="Ex: LOTE0001" required>
+
+      <button type="button" onclick="registrarBateria()">Registrar Bateria</button>
+      <button type="button" class="secundario" onclick="listarBaterias()">Listar Registros</button>
+    </form>
+
+    <div id="lista">
+      <h3>Baterias Registradas</h3>
+      <p style="color: #6c757d; font-style: italic; font-size: 0.9rem;">
+        Clique em "Listar Registros" para carregar as baterias.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const contractAddress = "0x32cBaF749625E361452F09169Fd11a911034c23E";
+    const contractABI = [
+      {
+        "inputs": [
+          {"internalType": "string","name": "_tipoUso","type": "string"},
+          {"internalType": "string","name": "_numeroSerie","type": "string"},
+          {"internalType": "string","name": "_dataProducao","type": "string"},
+          {"internalType": "string","name": "_lote","type": "string"}
+        ],
+        "name": "registrarBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "listar",
+        "outputs": [
+          {
+            "components": [
+              {"internalType": "string","name": "tipoUso","type": "string"},
+              {"internalType": "string","name": "numeroSerie","type": "string"},
+              {"internalType": "string","name": "dataProducao","type": "string"},
+              {"internalType": "string","name": "lote","type": "string"}
+            ],
+            "internalType": "struct BateriasMouraDefeituosas.Bateria[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    let provider, signer, contract;
+
+    async function conectar() {
+      if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+      } else {
+        alert("Por favor, instale o MetaMask!");
+      }
+    }
+
+    conectar();
+
+    async function registrarBateria() {
+      const tipoUso = document.getElementById("tipoUso").value;
+      const numeroSerie = document.getElementById("numeroSerie").value;
+      const dataProducao = document.getElementById("dataProducao").value;
+      const lote = document.getElementById("lote").value;
+
+      if (!tipoUso || !numeroSerie || !dataProducao || !lote) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+      }
+
+      try {
+        const tx = await contract.registrarBateria(tipoUso, numeroSerie, dataProducao, lote);
+        alert("Aguardando confirmação da transação...");
+        await tx.wait();
+        alert("✅ Bateria registrada com sucesso!");
+        document.getElementById("formBateria").reset(); // Limpa o formulário após o registro
+        listarBaterias();
+      } catch (error) {
+        // Verifica se é um erro de rejeição de transação
+        const errorMessage = error.message.includes('User rejected transaction') 
+                             ? "Transação rejeitada pelo usuário." 
+                             : "Erro ao registrar: " + error.message;
+        alert("❌ " + errorMessage);
+      }
+    }
+
+    async function listarBaterias() {
+      try {
+        const divLista = document.getElementById("lista");
+        divLista.innerHTML = "<h3>Baterias Registradas</h3><p>Carregando...</p>";
+        
+        const lista = await contract.listar();
+        
+        divLista.innerHTML = "<h3>Baterias Registradas</h3>";
+
+        if (lista.length === 0) {
+            divLista.innerHTML += `<p style="color: #6c757d; font-style: italic; font-size: 0.95rem;">
+                                      Nenhuma bateria registrada ainda.
+                                  </p>`;
+        } else {
+            lista.forEach((bateria, i) => {
+              divLista.innerHTML += `
+                <div class="bateria">
+                  <strong>#${i + 1}</strong><br>
+                  Tipo de Uso: ${bateria.tipoUso}<br>
+                  Nº de Série: ${bateria.numeroSerie}<br>
+                  Data de Produção: ${bateria.dataProducao}<br>
+                  Lote: ${bateria.lote}
+                </div>`;
+            });
+        }
+      } catch (error) {
+        alert("Erro ao listar baterias: Verifique a conexão com a rede ou o contrato. Detalhes: " + error.message);
+        const divLista = document.getElementById("lista");
+        divLista.innerHTML = `<h3>Baterias Registradas</h3><p style="color: red;">Erro ao carregar os dados.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
