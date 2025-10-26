@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moura Bateria - Controle de Defeito</title>
+    
+    <link rel="stylesheet" href="style.css"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+    
+    <div id="modal-overlay">
+        <div id="custom-modal">
+            <h3 id="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h3>
+            <p id="modal-content">Atenção! Este processo irá remover o registro de índice <strong id="modal-index-display">#X</strong> da Blockchain.<br>Por ser uma exclusão <strong>permanente</strong>, confirme os dados antes de prosseguir.</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="hideModal()">Cancelar</button>
+                <button class="btn btn-confirm" id="confirmRemovalBtn">Confirmar Remoção</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="top-header">
+        <div class="container">
+            
+            <div class="logo">
+                <a href="https://www.moura.com.br/" target="_blank">
+                   <img src="../assets/logo-moura.png" alt="Logo Moura" />
+                </a>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="#">A Moura</a>
+                <a href="#">Produtos</a>
+                <a href="#">Serviços</a>
+                <a href="#">Moura + Perto de Você</a>
+                <a href="#blog">Blog</a> <a href="#">Carreiras</a>
+            </nav>
+            
+            <div id="wallet-status-box" role="button" tabindex="0" aria-label="Conectar Carteira MetaMask" class="disconnected">
+                <span class="status-dot" id="wallet-dot"></span>
+                <span id="wallet-text">Conectar Carteira</span>
+                <i class="fas fa-wallet" id="wallet-icon" style="margin-left: 5px;"></i>
+            </div>
+            
+        </div>
+    </div>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1>Portal de Gestão de Ativos em Não-Conformidade (GNC).</h1> 
+            <p>Registre, audite e gerencie o ciclo de vida dos ativos da Moura com total transparência Blockchain.</p> 
+            <button class="btn btn-primary" id="scrollCadastrar">Registrar Novo Ativo</button>
+            <button class="btn btn-secondary" id="scrollListar">Auditar Registros Existentes</button>
+        </div>
+    </section>
+    
+    <section class="metrics-section">
+        <div class="container">
+            <h2 class="section-title">KPIs de Não-Conformidade</h2>
+            <div class="metrics-grid">
+                
+                <div class="metric-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Total de Registros (Ativos)</h3>
+                    <p id="totalRegistros">0</p>
+                </div>
+
+                <div class="metric-card">
+                    <i class="fas fa-car-battery"></i>
+                    <h3>Baterias Automotivas</h3>
+                    <p id="totalAutomotivas">0</p>
+                </div>
+
+                <div class="metric-card">
+                    <i class="fas fa-truck"></i>
+                    <h3>Baterias Industriais/Outros</h3>
+                    <p id="totalOutros">0</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <h2 class="section-title">Nossas Ferramentas</h2>
+
+        <div class="cards-grid">
+            
+            <div class="card" id="cardCadastrar">
+                <h2><i class="fas fa-plus-circle"></i> Cadastrar Nova Bateria</h2>
+                <input type="hidden" id="editIndex" value="-1" />
+                
+                <label for="tipo">Tipo de Bateria</label>
+                <select id="tipo" required>
+                    <option value="" disabled selected>-- Selecione um Tipo --</option>
+                    <option value="Automotiva">Carro (Automotiva)</option>
+                    <option value="Caminhao">Ônibus e Caminhão</option>
+                    <option value="Moto">Moto</option>
+                    <option value="Nautica">Náutica</option>
+                    <option value="Estacionaria">Estacionária</option>
+                    <option value="Tracionaria">Tracionária</option>
+                    <option value="Metroferroviaria">Metroferroviária</option>
+                    <option value="BESS">BESS</option>
+                </select>
+                <span class="error-message" id="tipoError"></span>
+
+                <label for="uso">Uso Reportado</label>
+                <input type="text" id="uso" placeholder="Ex: Curto-circuito, Falha na Partida" />
+                <span class="error-message" id="usoError"></span>
+                
+                <label for="nr_serie">Número de Série</label>
+                <input type="text" id="nr_serie" placeholder="Número de Série da Bateria" />
+                <span class="error-message" id="nr_serieError"></span>
+                
+                <label for="dataprod">Data de Fabricação</label>
+                <input type="date" id="dataprod" placeholder="Data de Fabricação (AAAA-MM-DD)" required />
+                <span class="error-message" id="dataprodError"></span>
+                
+                <label for="lote">Lote de Fabricação</label>
+                <input type="text" id="lote" placeholder="Lote de Fabricação" />
+                <span class="error-message" id="loteError"></span>
+                
+                <button class="btn btn-primary" id="cadastrarBtn"><i class="fas fa-save"></i> Registrar Defeito</button>
+            </div>
+
+            
+            <div class="card" id="cardListar">
+                <h2 style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-list-alt"></i> Listar Baterias Registradas</span>
+                    <i id="filterIconBtn" class="fas fa-filter filter-icon-btn" onclick="toggleFilterOptions()" style="display: none; cursor: pointer; color: var(--moura-blue);"></i>
+                </h2>
+
+                <p>Acesse a lista completa de todas as baterias marcadas como defeituosas na rede.</p>
+                
+                <button class="btn btn-primary" id="listarBtn"><i class="fas fa-eye"></i> Mostrar Registros</button>
+
+                <div id="listagemContainer" style="display: none;">
+                    
+                    <div id="filterOptions" class="filter-options-panel">
+                        <input type="text" id="filterNrSerie" placeholder="Buscar por Nº de Série..." onkeyup="filterBatteries()" />
+                        
+                        <select id="filterTipo" onchange="filterBatteries()">
+                            <option value="">Filtrar por Tipo (Todos)</option>
+                            <option value="Automotiva">Carro (Automotiva)</option>
+                            <option value="Caminhao">Ônibus e Caminhão</option>
+                            <option value="Moto">Moto</option>
+                            <option value="Nautica">Náutica</option>
+                            <option value="Estacionaria">Estacionária</option>
+                            <option value="Tracionaria">Tracionária</option>
+                            <option value="Metroferroviaria">Metroferroviária</option>
+                            <option value="BESS">BESS</option>
+                        </select>
+                        
+                        <button class="btn btn-reset" onclick="clearFilters()"><i class="fas fa-times"></i> Limpar</button>
+                    </div>
+                    
+                    <ul id="listaBaterias"></ul>
+                </div>
+            </div>
+
+            
+            <div class="card" id="cardRemover">
+                <h2><i class="fas fa-trash-alt"></i> Remover Registro</h2>
+                <p>Remova um registro específico da lista utilizando seu índice único.</p>
+                <input type="number" id="indexRemover" placeholder="Índice da bateria" />
+                <span id="removeErrorMsg" class="error-message" style="display: none;"></span> 
+                <button class="btn btn-primary" id="removerBtn"><i class="fas fa-minus-circle"></i> Remover Registro</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>
+                &copy; 2025 Moura Bateria. Todos os direitos reservados. | Desenvolvido por <strong>Abner Barreto e João Henrique</strong> com <a href="https://www.ethers.org/" target="_blank">Ethers.js</a> e Blockchain.
+            </p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
