@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Baterias Moura</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #004aad;
+      text-align: center;
+    }
+    .container {
+      background: white;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #004aad;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background-color: #0060ff;
+    }
+    .bateria {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 Registro de Baterias Moura</h1>
+  <div class="container">
+    <h3>Adicionar Bateria</h3>
+    <label>Tipo:</label>
+    <input type="text" id="tipo" placeholder="Ex: Premium 80Ah">
+
+    <label>Uso:</label>
+    <input type="text" id="uso" placeholder="automotivo / náutico / industrial">
+
+    <label>Número de Série:</label>
+    <input type="text" id="nr_serie">
+
+    <label>Data de Produção:</label>
+    <input type="text" id="dataprod" placeholder="YYYY-MM-DD">
+
+    <label>Lote:</label>
+    <input type="text" id="lote">
+
+    <button onclick="adicionarBateria()">Registrar</button>
+  </div>
+
+  <div class="container">
+    <h3>Consultar por Índice</h3>
+    <input type="number" id="index" placeholder="Ex: 0">
+    <button onclick="getBateria()">Buscar</button>
+    <pre id="bateriaInfo"></pre>
+  </div>
+
+  <div class="container">
+    <h3>Baterias Registradas</h3>
+    <button onclick="listarBaterias()">Listar Todas</button>
+    <div id="listaBaterias"></div>
+  </div>
+
+  <script>
+    const abi = [
+      {
+        "inputs": [
+          {"internalType": "string","name": "_tipo","type": "string"},
+          {"internalType": "string","name": "_uso","type": "string"},
+          {"internalType": "string","name": "_nr_serie","type": "string"},
+          {"internalType": "string","name": "_dataprod","type": "string"},
+          {"internalType": "string","name": "_lote","type": "string"}
+        ],
+        "name": "adicionarBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [{"internalType": "uint256","name": "_index","type": "uint256"}],
+        "name": "getBateria",
+        "outputs": [
+          {"internalType": "string","name": "","type": "string"},
+          {"internalType": "string","name": "","type": "string"},
+          {"internalType": "string","name": "","type": "string"},
+          {"internalType": "string","name": "","type": "string"},
+          {"internalType": "string","name": "","type": "string"}
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "listar",
+        "outputs": [
+          {
+            "components": [
+              {"internalType": "string","name": "tipo","type": "string"},
+              {"internalType": "string","name": "uso","type": "string"},
+              {"internalType": "string","name": "nr_serie","type": "string"},
+              {"internalType": "string","name": "dataprod","type": "string"},
+              {"internalType": "string","name": "lote","type": "string"}
+            ],
+            "internalType": "struct RegistroBateriasMoura.Bateria[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalBaterias",
+        "outputs": [{"internalType": "uint256","name": "","type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    // 👉 Substitua pelo endereço do contrato implantado
+    const contractAddress = "COLE_AQUI_O_ENDERECO_DO_CONTRATO";
+
+    let web3;
+    let contrato;
+    let conta;
+
+    async function conectar() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const contas = await web3.eth.getAccounts();
+        conta = contas[0];
+        contrato = new web3.eth.Contract(abi, contractAddress);
+        console.log("Conectado à conta:", conta);
+      } else {
+        alert("Instale a Metamask para usar esta aplicação!");
+      }
+    }
+
+    async function adicionarBateria() {
+      await conectar();
+      const tipo = document.getElementById("tipo").value;
+      const uso = document.getElementById("uso").value;
+      const nr_serie = document.getElementById("nr_serie").value;
+      const dataprod = document.getElementById("dataprod").value;
+      const lote = document.getElementById("lote").value;
+
+      await contrato.methods.adicionarBateria(tipo, uso, nr_serie, dataprod, lote)
+        .send({ from: conta });
+
+      alert("✅ Bateria registrada com sucesso!");
+    }
+
+    async function getBateria() {
+      await conectar();
+      const index = document.getElementById("index").value;
+      const dados = await contrato.methods.getBateria(index).call();
+      document.getElementById("bateriaInfo").textContent = 
+        `Tipo: ${dados[0]}\nUso: ${dados[1]}\nNº Série: ${dados[2]}\nData: ${dados[3]}\nLote: ${dados[4]}`;
+    }
+
+    async function listarBaterias() {
+      await conectar();
+      const lista = await contrato.methods.listar().call();
+      const container = document.getElementById("listaBaterias");
+      container.innerHTML = "";
+      lista.forEach((b, i) => {
+        container.innerHTML += `
+          <div class="bateria">
+            <b>#${i}</b><br>
+            Tipo: ${b.tipo}<br>
+            Uso: ${b.uso}<br>
+            Nº Série: ${b.nr_serie}<br>
+            Data: ${b.dataprod}<br>
+            Lote: ${b.lote}
+          </div>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>
