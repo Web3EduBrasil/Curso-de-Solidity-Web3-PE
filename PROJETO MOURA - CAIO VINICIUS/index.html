@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moura - Cadastro de Baterias</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f2f6fc;
+      font-family: "Poppins", sans-serif;
+    }
+    .navbar {
+      background-color: #0046ad;
+    }
+    .navbar-brand {
+      color: white !important;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .btn-primary {
+      background-color: #0046ad;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #002e73;
+    }
+    .bateria-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+    }
+    .small-muted { color: #6c757d; font-size: 0.9rem; }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">⚡ Moura - Cadastro de Baterias</a>
+      <button id="connectButton" class="btn btn-light ms-auto">Conectar MetaMask</button>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="card p-4">
+          <h4 class="mb-3 text-center text-primary">Cadastrar Nova Bateria</h4>
+          <form id="cadastroForm">
+            <div class="mb-2">
+              <input type="text" id="tipo" class="form-control" placeholder="Tipo" required>
+            </div>
+            <div class="mb-2">
+              <input type="text" id="uso" class="form-control" placeholder="Uso" required>
+            </div>
+            <div class="mb-2">
+              <input type="text" id="n_serie" class="form-control" placeholder="Número de Série" required>
+            </div>
+            <div class="mb-2">
+              <input type="text" id="data_prod" class="form-control" placeholder="Data de Produção" required>
+            </div>
+            <div class="mb-3">
+              <input type="text" id="lote" class="form-control" placeholder="Lote" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+        <div class="card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary">📋 Lista de Baterias</h4>
+            <div>
+              <button id="atualizarLista" class="btn btn-outline-primary btn-sm me-2">Atualizar</button>
+              <span id="connectedAddress" class="small-muted"></span>
+            </div>
+          </div>
+          <div id="listaBaterias" class="overflow-auto" style="max-height: 420px;">
+            <p class="text-muted text-center">Nenhuma bateria listada ainda...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Desenvolvido por Caio ⚡ | Projeto Moura</p>
+  </footer>
+
+  <!-- Modal de confirmação -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteLabel">Confirmar exclusão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Deseja realmente remover a bateria abaixo?</p>
+          <div id="deletePreview" class="small-muted"></div>
+          <div id="deleteError" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancelDelete" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // === CONFIGURE AQUI ===
+    const contractAddress = "0x2d9081A2df3DF88D18fDFa38dc1a8a94A8034b30";
+    // ABI mínima (apenas as funções usadas)
+    const contractABI = [
+      {
+        "inputs": [
+          {"internalType": "string", "name": "_tipo", "type": "string"},
+          {"internalType": "string", "name": "_uso", "type": "string"},
+          {"internalType": "string", "name": "_n_serie", "type": "string"},
+          {"internalType": "string", "name": "_data_prod", "type": "string"},
+          {"internalType": "string", "name": "_lote", "type": "string"}
+        ],
+        "name": "cadastrarBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "listarBateria",
+        "outputs": [
+          {
+            "components": [
+              {"internalType": "string","name": "tipo","type": "string"},
+              {"internalType": "string","name": "uso","type": "string"},
+              {"internalType": "string","name": "n_serie","type": "string"},
+              {"internalType": "string","name": "data_prod","type": "string"},
+              {"internalType": "string","name": "lote","type": "string"}
+            ],
+            "internalType": "struct Moura.Bateria[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {"internalType": "uint256","name":"index","type":"uint256"}
+        ],
+        "name": "removerBateria",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
+
+    // === VARIÁVEIS DE RUNTIME ===
+    let provider;
+    let signer;
+    let contract;
+    let selectedDeleteIndex = null;
+    const deleteModalEl = document.getElementById('confirmDeleteModal');
+    const bootstrapDeleteModal = new bootstrap.Modal(deleteModalEl);
+
+    // Conectar MetaMask
+    async function conectar() {
+      if (!window.ethereum) {
+        alert("MetaMask não encontrada. Instale a extensão para continuar.");
+        return;
+      }
+      try {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const address = await signer.getAddress();
+        document.getElementById('connectedAddress').innerText = shorten(address);
+        alert("✅ MetaMask conectada!");
+        listarBaterias(); // opcional: ao conectar, já busca lista
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao conectar MetaMask.");
+      }
+    }
+
+    function shorten(addr) {
+      if (!addr) return "";
+      return addr.slice(0,6) + "…" + addr.slice(-4);
+    }
+
+    // Cadastrar bateria
+    async function cadastrarBateria(event) {
+      event.preventDefault();
+      if (!contract) return alert("Conecte a MetaMask primeiro.");
+      const tipo = document.getElementById("tipo").value.trim();
+      const uso = document.getElementById("uso").value.trim();
+      const n_serie = document.getElementById("n_serie").value.trim();
+      const data_prod = document.getElementById("data_prod").value.trim();
+      const lote = document.getElementById("lote").value.trim();
+
+      try {
+        const tx = await contract.cadastrarBateria(tipo, uso, n_serie, data_prod, lote);
+        await tx.wait();
+        alert("⚡ Bateria cadastrada com sucesso!");
+        document.getElementById("cadastroForm").reset();
+        listarBaterias();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao cadastrar bateria. Veja console.");
+      }
+    }
+
+    // Listar baterias (filtra entradas deletadas)
+    async function listarBaterias() {
+      if (!contract) {
+        document.getElementById("listaBaterias").innerHTML = '<p class="text-muted text-center">Conecte a MetaMask para ver a lista.</p>';
+        return;
+      }
+      try {
+        const lista = await contract.listarBateria();
+        const divLista = document.getElementById("listaBaterias");
+        divLista.innerHTML = "";
+
+        // Filtra entradas que foram deletadas (todos campos vazios)
+        const filtered = lista.map((b, i) => ({...b, index: i}))
+                              .filter(b => {
+                                return ( (b.tipo && b.tipo !== "") ||
+                                         (b.uso && b.uso !== "") ||
+                                         (b.n_serie && b.n_serie !== "") ||
+                                         (b.data_prod && b.data_prod !== "") ||
+                                         (b.lote && b.lote !== "") );
+                              });
+
+        if (filtered.length === 0) {
+          divLista.innerHTML = '<p class="text-muted text-center">Nenhuma bateria cadastrada ainda...</p>';
+          return;
+        }
+
+        filtered.forEach((b, idx) => {
+          const item = document.createElement("div");
+          item.className = "bateria-item d-flex justify-content-between align-items-start";
+          item.innerHTML = `
+            <div>
+              <strong class="text-primary">#${b.index}</strong> <span class="small-muted">(${idx + 1} de ${filtered.length})</span><br>
+              <b>Tipo:</b> ${escapeHtml(b.tipo)}<br>
+              <b>Uso:</b> ${escapeHtml(b.uso)}<br>
+              <b>Série:</b> ${escapeHtml(b.n_serie)}<br>
+              <b>Data:</b> ${escapeHtml(b.data_prod)}<br>
+              <b>Lote:</b> ${escapeHtml(b.lote)}
+            </div>
+            <div class="text-end">
+              <button class="btn btn-sm btn-outline-danger" data-index="${b.index}">Remover</button>
+            </div>
+          `;
+          divLista.appendChild(item);
+
+          // attach delete handler
+          item.querySelector('button').addEventListener('click', (e) => {
+            const idxToRemove = Number(e.currentTarget.getAttribute('data-index'));
+            openConfirmDelete(idxToRemove, b);
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById("listaBaterias").innerHTML = '<p class="text-danger text-center">Erro ao listar baterias. Veja console.</p>';
+      }
+    }
+
+    // Escapar HTML para evitar injeção na UI
+    function escapeHtml(str) {
+      if (!str && str !== "") return "";
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Abre modal de confirmação, preenche preview
+    function openConfirmDelete(index, bateria) {
+      selectedDeleteIndex = index;
+      document.getElementById('deletePreview').innerHTML = `
+        <div><b>#${index}</b> — <b>Tipo:</b> ${escapeHtml(bateria.tipo)} | <b>Série:</b> ${escapeHtml(bateria.n_serie)}</div>
+        <div class="small-muted"><b>Uso:</b> ${escapeHtml(bateria.uso)} • <b>Data:</b> ${escapeHtml(bateria.data_prod)} • <b>Lote:</b> ${escapeHtml(bateria.lote)}</div>
+      `;
+      document.getElementById('deleteError').style.display = 'none';
+      bootstrapDeleteModal.show();
+    }
+
+    // Executa remoção chamando o contrato
+    async function confirmarDelete() {
+      if (!contract) {
+        document.getElementById('deleteError').innerText = 'MetaMask não conectada.';
+        document.getElementById('deleteError').style.display = 'block';
+        return;
+      }
+      if (selectedDeleteIndex === null) return;
+      try {
+        // chama removerBateria(index)
+        const tx = await contract.removerBateria(selectedDeleteIndex);
+        await tx.wait();
+        bootstrapDeleteModal.hide();
+        alert('Bateria removida com sucesso.');
+        selectedDeleteIndex = null;
+        listarBaterias();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('deleteError').innerText = 'Erro ao remover. Veja console.';
+        document.getElementById('deleteError').style.display = 'block';
+      }
+    }
+
+    // Eventos
+    document.getElementById("connectButton").onclick = conectar;
+    document.getElementById("cadastroForm").onsubmit = cadastrarBateria;
+    document.getElementById("atualizarLista").onclick = listarBaterias;
+    document.getElementById("confirmDeleteBtn").onclick = confirmarDelete;
+
+    // Inicial: mostra mensagem amigável antes de conectar
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('connectedAddress').innerText = '';
+    });
+  </script>
+</body>
+</html>
