@@ -1,0 +1,172 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"name": "adicionarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "pos",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "uso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nr_serie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"name": "alterarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getBateria",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasPremiumDefeituosas.Bateria",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBaterias",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "uso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "nr_serie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasPremiumDefeituosas.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNumeroBaterias",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
