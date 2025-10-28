@@ -1,0 +1,193 @@
+:root {
+    --azul-moura: #0033A0;
+    --amarelo-moura: #FFD100;
+    --branco: #FFFFFF;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--branco);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--azul-moura);
+    color: var(--branco);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logo {
+    width: 120px;
+    margin: 0 auto 10px;
+}
+
+h1 {
+    margin: 0 0 15px 0;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+}
+
+
+#connectionStatus {
+    color: var(--amarelo-moura);
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#connectBtn {
+    background-color: var(--amarelo-moura);
+    color: var(--azul-moura);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+#connectBtn:hover {
+    background-color: #e6c000;
+}
+
+main {
+    max-width: 900px;
+    margin: 2rem auto;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+form {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.input-group[style="grid-column: 1 / 3;"] {
+    grid-column: 1 / 3;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--azul-moura);
+    font-size: 0.9rem;
+}
+
+input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    border-color: var(--amarelo-moura);
+    box-shadow: 0 0 5px rgba(255, 209, 0, 0.5);
+    outline: none;
+}
+
+form button[type="submit"] {
+    grid-column: 3 / -1;
+    padding: 15px;
+    background-color: var(--amarelo-moura);
+    color: var(--azul-moura);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    align-self: end;
+}
+
+form button[type="submit"]:hover {
+    background-color: var(--azul-moura);
+    color: var(--branco);
+}
+
+
+
+.list-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.list-section th,
+.list-section td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.list-section thead th {
+    background-color: var(--azul-moura);
+    color: var(--branco);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--amarelo-moura);
+}
+
+.list-section tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.list-section tbody tr:hover {
+    background-color: #e6e6e6;
+}
+
+.actions button {
+    margin: 0 3px;
+    font-size: 0.9rem;
+    padding: 5px 8px;
+    background-color: var(--amarelo-moura);
+    color: var(--azul-moura);
+    border: none;
+    border-radius: 4px;
+}
+
+.actions button:hover {
+    background-color: var(--azul-moura);
+    color: var(--branco);
+}
+
+.actions button {
+    background-color: #d9534f;
+    /* Vermelho */
+    color: var(--branco);
+}
+
+.actions button:hover {
+    background-color: #c9302c;
+}
+
+
+
+footer {
+    text-align: center;
+    background-color: var(--azul-moura);
+    color: var(--branco);
+    padding: 1rem;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+}

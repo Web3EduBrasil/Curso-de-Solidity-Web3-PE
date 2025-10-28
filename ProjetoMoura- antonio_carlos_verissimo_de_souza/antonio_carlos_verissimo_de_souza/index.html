@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Cadastro de Baterias - Moura</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <img src="https://cdn.motor1.com/images/mgl/gYzem/s1/1x1/logo-moura.webp" alt="Logo Moura" class="logo">
+        <h1>Cadastro de Baterias Moura </h1>
+        <button id="connectBtn">Conectar MetaMask</button>
+        <p id="connectionStatus"></p>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Nova Bateria</h2>
+            <form id="batteryForm">
+                <div class="input-group">
+                    <label for="batteryType">Tipo de Bateria</label>
+                    <input type="text" id="batteryType" placeholder="Ex: 12V 60Ah, 220Ah" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="lote">Lote</label>
+                    <input type="text" id="lote" placeholder="Ex: L001-2025" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="serialNumber">Número de Série</label>
+                    <input type="text" id="serialNumber" placeholder="Ex: M080A-123456" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="productionDate">Data de Produção</label>
+                    <input type="date" id="productionDate" required />
+                </div>
+
+                <div class="input-group" style="grid-column: 1 / 3;">
+                    <label for="batteryUse">Uso (Automotiva ou Estacionária)</label>
+                    <input type="text" id="batteryUse" placeholder="Ex: Automotiva, Estacionária" required />
+                </div>
+
+                <button type="submit" id="submitBtn" style="grid-column: 3 / -1; align-self: end;">Cadastrar
+                    Bateria</button>
+            </form>
+        </section>
+
+        <section class="list-section">
+            <h2>Lista de Baterias Cadastradas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Uso</th>
+                        <th>Lote</th>
+                        <th>Série</th>
+                        <th>Produção</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="batteryList"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        © 2025 Moura | Sistema de Gestão de Baterias
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.1/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

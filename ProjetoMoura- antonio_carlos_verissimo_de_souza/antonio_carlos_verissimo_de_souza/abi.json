@@ -1,0 +1,120 @@
+[
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "string", "name": "serialNumber", "type": "string" }
+        ],
+        "name": "BatteryCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "string", "name": "serialNumber", "type": "string" }
+        ],
+        "name": "BatteryUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "string", "name": "serialNumber", "type": "string" }
+        ],
+        "name": "BatteryDeleted",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalBatteries",
+        "outputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "listBatteries",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "string", "name": "batteryType", "type": "string" },
+                    { "internalType": "string", "name": "use", "type": "string" },
+                    { "internalType": "string", "name": "lote", "type": "string" },
+                    { "internalType": "string", "name": "serialNumber", "type": "string" },
+                    { "internalType": "uint256", "name": "productionDate", "type": "uint256" },
+                    { "internalType": "bool", "name": "exists", "type": "bool" }
+                ],
+                "internalType": "struct Baterias.Battery[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "string", "name": "_serialNumber", "type": "string" }
+        ],
+        "name": "getBattery",
+        "outputs": [
+            { "internalType": "string", "name": "batteryType", "type": "string" },
+            { "internalType": "string", "name": "use", "type": "string" },
+            { "internalType": "string", "name": "lote", "type": "string" },
+            { "internalType": "string", "name": "serialNumber", "type": "string" },
+            { "internalType": "uint256", "name": "productionDate", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "string", "name": "_batteryType", "type": "string" },
+            { "internalType": "string", "name": "_use", "type": "string" },
+            { "internalType": "string", "name": "_lote", "type": "string" },
+            { "internalType": "string", "name": "_serialNumber", "type": "string" },
+            { "internalType": "uint256", "name": "_productionDate", "type": "uint256" }
+        ],
+        "name": "createBattery",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "string", "name": "_serialNumber", "type": "string" },
+            { "internalType": "string", "name": "_batteryType", "type": "string" },
+            { "internalType": "string", "name": "_use", "type": "string" },
+            { "internalType": "string", "name": "_lote", "type": "string" },
+            { "internalType": "uint256", "name": "_productionDate", "type": "uint256" }
+        ],
+        "name": "updateBattery",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "string", "name": "_serialNumber", "type": "string" }
+        ],
+        "name": "deleteBattery",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
