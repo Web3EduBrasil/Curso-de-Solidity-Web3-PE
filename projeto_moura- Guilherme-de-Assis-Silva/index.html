@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Moura Batteries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --amarelo-moura: #FFD700;
+            --azul-escuro: #002F5D;
+            --branco: #FFFFFF;
+            --cinza-claro: #F5F5F5;
+            --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--cinza-claro) 0%, #e9ecef 100%);
+            color: var(--azul-escuro);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--azul-escuro);
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: var(--sombra);
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            background: var(--branco);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: var(--sombra);
+        }
+
+        h1 {
+            color: var(--branco);
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: var(--branco);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: var(--sombra);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--azul-escuro);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--amarelo-moura);
+            outline: none;
+        }
+
+        .btn {
+            background-color: var(--amarelo-moura);
+            color: var(--azul-escuro);
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: var(--sombra);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #FFC700;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            background-color: #E6C200;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--amarelo-moura);
+        }
+
+        .instrucoes {
+            background: #e9f7fe;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--azul-escuro);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <!-- Logo da Moura com imagem externa -->
+            <img src="https://logodownload.org/wp-content/uploads/2017/08/moura-logo-1.png"
+                 alt="Logo Moura" class="logo">
+        </div>
+        <h1>Sistema de Gerenciamento de Baterias Moura</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2 style="color: var(--azul-escuro); margin-top: 0;">Cadastrar Nova Bateria</h2>
+
+            <div class="instrucoes">
+                <h3 style="color: var(--azul-escuro); margin-top: 0;">Instruções:</h3>
+                <p id="instrucoes-text">Carregando instruções...</p>
+            </div>
+
+            <form id="cadastroForm">
+                <div class="form-group">
+                    <label for="tipo">Tipo da Bateria</label>
+                    <input type="text" id="tipo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="uso">Tipo de Uso</label>
+                    <select id="uso" required>
+                        <option value="">Selecione...</option>
+                        <option value="1">Automotivo</option>
+                        <option value="2">Náutico</option>
+                        <option value="3">Industrial</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nrserie">Número de Série</label>
+                    <input type="number" id="nrserie" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataprod">Data de Produção (DD/MM/AAAA)</label>
+                    <input type="text" id="dataprod" placeholder="DD/MM/AAAA" maxlength="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="lote">Número do Lote</label>
+                    <input type="text" id="lote" required>
+                </div>
+
+                <button type="submit" class="btn btn-block">Cadastrar Bateria</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="color: var(--azul-escuro); margin-top: 0;">Consultar Bateria</h2>
+
+            <div class="form-group">
+                <label for="bateriaId">ID da Bateria</label>
+                <input type="number" id="bateriaId" min="1" required>
+            </div>
+
+            <button id="consultarBtn" class="btn">Consultar</button>
+
+            <div class="result-container" id="resultado">
+                <p>Os dados da bateria selecionada serão exibidos aqui.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 Moura - Tecnologia e Energia de Confiança</p>
+    </footer>
+
+    <script>
+        // Máscara para o campo de data (DD/MM/AAAA)
+        document.getElementById('dataprod').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+            if (value.length > 8) value = value.substring(0, 8);
+
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5);
+            }
+
+            e.target.value = value;
+        });
+
+        // Inicialização da interface
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Carregar instruções do contrato
+            try {
+                // Simulação - substitua pela chamada real ao contrato
+                document.getElementById('instrucoes-text').textContent =
+                    "Em uso, preencha com:\n[1] para Automotivo\n[2] para Náutico\n[3] para Industrial";
+            } catch (error) {
+                console.error("Erro ao carregar instruções:", error);
+                document.getElementById('instrucoes-text').textContent =
+                    "Não foi possível carregar as instruções. Verifique sua conexão com a blockchain.";
+            }
+
+            // Configurar formulário de cadastro
+            document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const tipo = document.getElementById('tipo').value;
+                const uso = parseInt(document.getElementById('uso').value);
+                const nrserie = parseInt(document.getElementById('nrserie').value);
+                const dataprod = document.getElementById('dataprod').value;
+                const lote = document.getElementById('lote').value;
+
+                // Validação da data
+                if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dataprod)) {
+                    alert("Por favor, informe a data no formato DD/MM/AAAA");
+                    return;
+                }
+
+                try {
+                    // Simulação - substitua pela chamada real ao contrato
+                    console.log("Enviando para o contrato:", { tipo, uso, nrserie, dataprod, lote });
+                    alert("Bateria cadastrada com sucesso! (Simulação)");
+
+                    // Limpar formulário
+                    this.reset();
+                } catch (error) {
+                    console.error("Erro ao cadastrar bateria:", error);
+                    alert("Erro ao cadastrar bateria. Verifique os dados e tente novamente.");
+                }
+            });
+
+            // Configurar botão de consulta
+            document.getElementById('consultarBtn').addEventListener('click', async function() {
+                const id = parseInt(document.getElementById('bateriaId').value);
+
+                if (!id || id < 1) {
+                    alert("Por favor, informe um ID válido");
+                    return;
+                }
+
+                try {
+                    // Simulação - substitua pela chamada real ao contrato
+                    const bateria = {
+                        tipo: "Bateria Exemplo",
+                        uso: 1, // 0: Automotivo, 1: Náutico, 2: Industrial
+                        nr_serie: 123456789,
+                        dataprod: "01/01/2023",
+                        lote: "LOTE2023001"
+                    };
+
+                    const usoTexto = bateria.uso === 0 ? "Automotivo" :
+                                    bateria.uso === 1 ? "Náutico" : "Industrial";
+
+                    document.getElementById('resultado').innerHTML = `
+                        <h3>Dados da Bateria #${id}</h3>
+                        <p><strong>Tipo:</strong> ${bateria.tipo}</p>
+                        <p><strong>Uso:</strong> ${usoTexto}</p>
+                        <p><strong>Nº Série:</strong> ${bateria.nr_serie}</p>
+                        <p><strong>Data Produção:</strong> ${bateria.dataprod}</p>
+                        <p><strong>Lote:</strong> ${bateria.lote}</p>
+                    `;
+                } catch (error) {
+                    console.error("Erro ao consultar bateria:", error);
+                    document.getElementById('resultado').innerHTML =
+                        `<p style="color: #dc3545;">Erro ao consultar bateria. Verifique o ID e tente novamente.</p>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_uso",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_nrserie",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "atribuirValores",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "baterias",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "enum bateriasMoura.Uso",
+				"name": "uso",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nr_serie",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "dataprod",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "instrucao",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "listar",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "enum bateriasMoura.Uso",
+						"name": "uso",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nr_serie",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "dataprod",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct bateriasMoura.Bateria",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
