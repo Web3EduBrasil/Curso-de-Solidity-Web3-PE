@@ -1,0 +1,112 @@
+[
+	{
+		"inputs": [],
+		"name": "listar",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "tipoUso",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "numeroSerie",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "dataProducao",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					}
+				],
+				"internalType": "struct BateriasMouraDefeituosas.Bateria[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_indice",
+				"type": "uint256"
+			}
+		],
+		"name": "obterBateria",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "tipoUso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "numeroSerie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dataProducao",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipoUso",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_numeroSerie",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_dataProducao",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "registrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalBaterias",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
