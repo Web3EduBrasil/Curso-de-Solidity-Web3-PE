@@ -1,0 +1,284 @@
+[
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "serialNumber",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+				"name": "uso",
+				"type": "uint8"
+			}
+		],
+		"name": "BateriaRegistrada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "idRemovido",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "serialNumber",
+				"type": "string"
+			}
+		],
+		"name": "BateriaRemovida",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+				"name": "_uso",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "_serialNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_dataProducao",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_lote",
+				"type": "string"
+			}
+		],
+		"name": "registrarBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_serialNumber",
+				"type": "string"
+			}
+		],
+		"name": "removerBateria",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getBateria",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+						"name": "uso",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "serialNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dataProducao",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dataRegistro",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct RegistroBateriasMouraV3_Aberto.BateriaDefeituosa",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getContagemTotal",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "listaBateriasDefeituosas",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+				"name": "uso",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "serialNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dataProducao",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "lote",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dataRegistro",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "listarBaterias",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+						"name": "uso",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "serialNumber",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dataProducao",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "lote",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dataRegistro",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct RegistroBateriasMouraV3_Aberto.BateriaDefeituosa[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
