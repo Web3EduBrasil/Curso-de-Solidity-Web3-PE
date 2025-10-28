@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Registro de Baterias Defeituosas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+            type="application/javascript"></script>
+
+    <style>
+        /* --- Variáveis de Cor (Tema Claro) --- */
+        :root {
+            --primary-color: #fddb00; /* Amarelo Moura */
+            --secondary-color: #0d1e57; /* Azul Escuro Moura */
+            --background-light: #f4f4f4; /* Fundo principal claro */
+            --card-background: #ffffff; /* Fundo dos cards branco */
+            --text-color: #333333; /* Texto principal escuro */
+            --border-color: #dddddd; /* Bordas suaves */
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --input-bg: #f9f9f9;
+            --input-border: #cccccc;
+            --header-bg: #0d1e57;
+            --button-hover-bg: #e0c200;
+        }
+
+        /* --- Estilos Gerais --- */
+        body {
+            background-color: var(--background-light);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            text-align: center;
+        }
+
+        /* --- Header / Navegação --- */
+        header {
+            background-color: var(--header-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+
+        .nav-buttons button {
+            background-color: transparent;
+            color: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-buttons button:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-buttons button.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .wallet-info {
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        #btnConnect {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- Conteúdo Principal / Cards --- */
+        main {
+            margin-top: 30px;
+        }
+
+        .content-card {
+            background-color: var(--card-background);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .content-card h2, .content-card h3 {
+            text-align: left;
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+
+        .content-card h2 {
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .content-card h3 {
+             margin-top: 25px;
+             margin-bottom: 15px;
+             border-bottom: 1px dashed var(--border-color);
+             padding-bottom: 10px;
+        }
+
+        /* --- Formulários --- */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex-basis: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: calc(100% - 24px);
+            padding: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(253, 219, 0, 0.5);
+        }
+
+        /* --- Botões de Ação --- */
+        .action-buttons {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .action-buttons button,
+        .section-actions button {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .section-actions {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 15px;
+             align-items: center;
+        }
+
+        /* --- Log de Status --- */
+        #statusLog {
+            background-color: #222; /* Log escuro para contraste */
+            color: #f0f0f0;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 100px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        /* --- Tabela de Baterias --- */
+        .battery-table-container {
+            overflow-x: auto;
+        }
+
+        .battery-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .battery-table th, .battery-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .battery-table thead {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .battery-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* --- Estilos (Aba Gerenciar) --- */
+
+        /* Cards de Estatísticas */
+        .stat-card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .stat-card h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .stat-card-content {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            word-wrap: break-word;
+        }
+
+        .stat-card button {
+             padding: 8px 15px;
+             font-size: 14px;
+             margin-top: 15px;
+        }
+
+        /* Card de Detalhe da Bateria */
+        .bateria-detalhe-card {
+            background-color: #fff8eb; /* Fundo levemente amarelado */
+            border: 1px solid var(--primary-color);
+            border-left-width: 5px;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .bateria-detalhe-card h3 {
+             border: none;
+             margin-bottom: 15px;
+        }
+
+        .bateria-detalhe-content ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .bateria-detalhe-content li {
+            font-size: 16px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0e0b0;
+        }
+         .bateria-detalhe-content li:last-child {
+            border-bottom: none;
+         }
+
+        .bateria-detalhe-content li strong {
+            display: inline-block;
+            width: 130px;
+            color: #555;
+        }
+
+        /* --- Utilitários --- */
+        .hidden {
+            display: none;
+        }
+
+        /* --- Media Queries --- */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            header {
+                flex-direction: column;
+                align-items: center;
+                padding-bottom: 10px;
+            }
+            .logo {
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+            .nav-buttons {
+                width: 100%;
+                margin: 0 0 15px 0;
+                justify-content: space-around;
+            }
+             .nav-buttons button {
+                flex: 1;
+                margin: 0 5px;
+                font-size: 14px;
+            }
+            .wallet-info {
+                width: 100%;
+                text-align: center;
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">MOURA</div>
+        <nav class="nav-buttons">
+            <button id="showRegister" class="active">Registrar Bateria</button>
+            <button id="showManage">Gerenciar Baterias</button>
+        </nav>
+        <div class="wallet-info">
+            <button id="btnConnect">Conectar Carteira</button>
+            <div id="walletStatus">Status: Desconectado</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Sistema de Registro de Baterias Defeituosas</h1>
+
+        <main>
+
+            <section id="registerSection" class="content-card">
+                <h2>Registrar Nova Bateria Defeituosa</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regTipo">Tipo da Bateria (Ex: AGM, EFB)</label>
+                        <input type="text" id="regTipo" placeholder="Ex: 60Ah EFB">
+                    </div>
+                    <div class="form-group">
+                        <label for="regUso">Tipo de Uso</label>
+                        <select id="regUso">
+                            <option value="">Selecione o Uso</option>
+                            <option value="0">Automotivo</option>
+                            <option value="1">Náutico</option>
+                            <option value="2">Industrial</option>
+                            <option value="3">Estacionária</option>
+                            <option value="4">Acumulador</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="regSerial">Número de Série</label>
+                        <input type="text" id="regSerial" placeholder="Número de série único">
+                    </div>
+                    <div class="form-group">
+                        <label for="regDataProd">Data de Produção</label>
+                        <input type="date" id="regDataProd">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="regLote">Lote de Fabricação</label>
+                        <input type="text" id="regLote" placeholder="Ex: LOTE-2025-A1">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="btnRegistrarBateria">Registrar Bateria</button>
+                </div>
+            </section>
+
+            <section id="manageSection" class="content-card hidden">
+                <h2>Gerenciar Baterias</h2>
+
+                <div class="stat-card-container">
+                    <div class="stat-card">
+                        <h4>Total de Baterias Registradas</h4>
+                        <span class="stat-card-content" id="totalCountDisplay">N/A</span>
+                        <button id="btnGetContagemTotal" class="section-actions">Atualizar</button>
+                    </div>
+                     </div>
+
+                <h3>Consultar Bateria Específica</h3>
+                <div class="section-actions">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="getBatId">ID da Bateria</label>
+                        <input type="number" id="getBatId" placeholder="ID para consultar">
+                    </div>
+                    <button id="btnGetBateria" style="align-self: flex-end; margin-bottom: 5px;">Consultar por ID</button>
+                </div>
+
+                <div id="bateriaDetalheCard" class="bateria-detalhe-card hidden">
+                    <h3>Detalhes da Bateria</h3>
+                    <div id="bateriaDetalheContent">
+                        </div>
+                </div>
+
+                <h3>Remover Bateria</h3>
+                <div class="section-actions">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="remSerial">Número de Série para Remover</label>
+                        <input type="text" id="remSerial" placeholder="Serial para remover">
+                    </div>
+                    <button id="btnRemoverBateria" style="background-color: var(--error-color); color: white; align-self: flex-end; margin-bottom: 5px;">Remover</button>
+                </div>
+
+                <h3>Lista Completa de Baterias</h3>
+                <div class="section-actions">
+                    <button id="btnListarBaterias">Atualizar Lista</button>
+                </div>
+                <div class="battery-table-container">
+                    <table class="battery-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nº de Série</th>
+                                <th>Tipo</th>
+                                <th>Uso</th>
+                                <th>Lote</th>
+                                <th>Data Produção</th>
+                                <th>Data Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batteryListBody">
+                            <tr><td colspan="7" style="text-align: center;">Nenhuma bateria registrada ou lista vazia.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="statusResults" class="content-card">
+                <h2>Status e Mensagens</h2>
+                <div id="statusLog">
+                    Aguardando interação...
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Configuração do Contrato ---
+        // TODO: COLE O ENDEREÇO DO SEU CONTRATO DEPLOYADO AQUI
+        const contractAddress = "0xC8183991305eC6ea37527d973801a6b05d736659";
+
+        // --- NOVA ABI ---
+        const abi = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "serialNumber",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "tipo",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+                        "name": "uso",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "BateriaRegistrada",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "idRemovido",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "serialNumber",
+                        "type": "string"
+                    }
+                ],
+                "name": "BateriaRemovida",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_tipo",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+                        "name": "_uso",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_serialNumber",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_dataProducao",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_lote",
+                        "type": "string"
+                    }
+                ],
+                "name": "registrarBateria",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_serialNumber",
+                        "type": "string"
+                    }
+                ],
+                "name": "removerBateria",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_id",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getBateria",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "tipo",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+                                "name": "uso",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "serialNumber",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "dataProducao",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "lote",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "dataRegistro",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct RegistroBateriasMouraV3_Aberto.BateriaDefeituosa",
+                        "name": "",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getContagemTotal",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "listaBateriasDefeituosas",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "tipo",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+                        "name": "uso",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "serialNumber",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "dataProducao",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "lote",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "dataRegistro",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "listarBaterias",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "tipo",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "enum RegistroBateriasMouraV3_Aberto.TipoUso",
+                                "name": "uso",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "serialNumber",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "dataProducao",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "lote",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "dataRegistro",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct RegistroBateriasMouraV3_Aberto.BateriaDefeituosa[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+        // --- FIM DA NOVA ABI ---
+
+
+        // --- Variáveis Globais ---
+        let provider;
+        let signer;
+        let contract;
+
+        // --- Elementos do DOM ---
+        const btnConnect = document.getElementById('btnConnect');
+        const walletStatus = document.getElementById('walletStatus');
+        const statusLogDiv = document.getElementById('statusLog');
+        const batteryListBody = document.getElementById('batteryListBody');
+
+        // Seções
+        const registerSection = document.getElementById('registerSection');
+        const manageSection = document.getElementById('manageSection');
+
+        // Botões de Navegação
+        const showRegisterBtn = document.getElementById('showRegister');
+        const showManageBtn = document.getElementById('showManage');
+
+        // Botões de Ação
+        const btnRegistrarBateria = document.getElementById('btnRegistrarBateria');
+        const btnRemoverBateria = document.getElementById('btnRemoverBateria');
+        const btnGetBateria = document.getElementById('btnGetBateria');
+        const btnGetContagemTotal = document.getElementById('btnGetContagemTotal');
+        const btnListarBaterias = document.getElementById('btnListarBaterias');
+        // const btnGetOwner = document.getElementById('btnGetOwner'); // Removido
+
+        // Elementos de Exibição de Dados
+        const totalCountDisplay = document.getElementById('totalCountDisplay');
+        // const ownerDisplay = document.getElementById('ownerDisplay'); // Removido
+        const bateriaDetalheCard = document.getElementById('bateriaDetalheCard');
+        const bateriaDetalheContent = document.getElementById('bateriaDetalheContent');
+
+        // --- Funções de Exibição (Log de Status) ---
+        function showStatus(message) {
+            console.log(message);
+            statusLogDiv.innerHTML = `<pre>${message}</pre>`;
+        }
+
+        function showSuccess(message) {
+            console.log(message);
+            statusLogDiv.innerHTML = `<pre class="success">${message}</pre>`;
+        }
+
+        function showError(error) {
+            console.error(error);
+            let message = error.message;
+            if (error.data && error.data.message) {
+                message = error.data.message;
+            } else if (error.reason) {
+                message = error.reason;
+            }
+            statusLogDiv.innerHTML = `<pre class="error">Erro: ${message}</pre>`;
+        }
+
+        async function showTxConfirmation(tx) {
+            showStatus(`Transação enviada: ${tx.hash}\nAguardando confirmação...`);
+            try {
+                const receipt = await tx.wait();
+                showSuccess(`Transação confirmada!\nHash: ${receipt.transactionHash}\nBloco: ${receipt.blockNumber}`);
+                if (tx.hash) {
+                    await updateBatteryList(); // Atualiza a lista após registro ou remoção
+                    await updateDashboardStats(); // Atualiza a contagem total
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // --- Função de Conexão ---
+        async function connectWallet() {
+            console.log("Iniciando connectWallet...");
+            showStatus("Conectando à MetaMask...");
+
+            if (typeof window.ethereum === 'undefined') {
+                console.error("MetaMask não detectado.");
+                return showError('MetaMask não está instalado!');
+            }
+            console.log("window.ethereum detectado.");
+
+            // Verifica o endereço do contrato AQUI
+            if (!contractAddress || contractAddress === "SEU_ENDERECO_DE_CONTRATO_AQUI") {
+                 console.error("Endereço do contrato não configurado.");
+                 return showError("Erro de configuração: Por favor, adicione o endereço do contrato no arquivo HTML.");
+             }
+            console.log("Endereço do contrato configurado:", contractAddress);
+
+
+            try {
+                console.log("Solicitando contas (eth_requestAccounts)...");
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("Contas aprovadas:", accounts);
+
+                if (accounts.length === 0) {
+                     console.error("Nenhuma conta foi conectada.");
+                     return showError("Nenhuma conta foi conectada. Por favor, tente novamente.");
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                const address = await signer.getAddress();
+                contract = new ethers.Contract(contractAddress, abi, signer);
+                console.log("Instância do contrato criada com sucesso.");
+
+                walletStatus.innerHTML = `Conectado: <br><strong>${address}</strong>`;
+                btnConnect.textContent = 'Carteira Conectada';
+                btnConnect.disabled = true;
+
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        walletStatus.innerHTML = 'Status: Desconectado';
+                        btnConnect.textContent = 'Conectar Carteira';
+                        btnConnect.disabled = false;
+                        showStatus('Carteira desconectada.');
+                        batteryListBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Conecte sua carteira para ver as baterias.</td></tr>';
+                        totalCountDisplay.textContent = 'N/A'; // Reseta stats
+                    } else {
+                        connectWallet();
+                    }
+                });
+
+                window.ethereum.on('chainChanged', (chainId) => {
+                    console.log("Rede alterada para:", chainId);
+                    connectWallet();
+                });
+
+                showSuccess("Carteira conectada com sucesso!");
+                await updateDashboardStats();
+            } catch (error) {
+                console.error("Erro durante a conexão:", error);
+                showError(error);
+            }
+        }
+
+        // --- Funções de Interação com Contrato ---
+
+        async function callViewFunction(functionName, args = []) {
+            // Verifica se o provider está definido ANTES de tentar usá-lo
+            if (!provider && typeof window.ethereum !== 'undefined') {
+                 // Tenta inicializar apenas o provider se a carteira já deu permissão mas a página recarregou
+                 try {
+                     provider = new ethers.providers.Web3Provider(window.ethereum);
+                 } catch (e) {
+                      showError("Conecte sua carteira para visualizar dados.");
+                      return null;
+                 }
+            } else if (!provider) {
+                showError("Conecte sua carteira para visualizar dados.");
+                return null;
+            }
+
+            // Continua se o provider estiver ok
+            try {
+                const readContract = new ethers.Contract(contractAddress, abi, provider);
+                showStatus(`Consultando "${functionName}" na blockchain...`);
+                const result = await readContract[functionName](...args);
+                return result;
+            } catch (error) {
+                showError(error);
+                return null;
+            }
+        }
+
+
+        async function callWriteFunction(functionName, args = []) {
+             if (!contract) {
+                showError("Por favor, conecte sua carteira primeiro.");
+                return;
+            }
+            try {
+                showStatus(`Iniciando transação "${functionName}"... Por favor, aprove na MetaMask.`);
+                const tx = await contract[functionName](...args);
+                await showTxConfirmation(tx);
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // --- Funções Auxiliares de UI e Dados ---
+
+        const usoMap = {
+            0: "Automotivo",
+            1: "Náutico",
+            2: "Industrial",
+            3: "Estacionária",
+            4: "Acumulador"
+        };
+
+        function formatDateFromTimestamp(timestamp) {
+            if (!timestamp || Number(timestamp) === 0) return 'N/A';
+            const date = new Date(Number(timestamp) * 1000);
+            return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+        }
+
+        function formatInputDateToTimestamp(dateString) {
+            if (!dateString) return 0;
+            const date = new Date(dateString);
+            return Math.floor(date.getTime() / 1000);
+        }
+
+        async function updateBatteryList() {
+            batteryListBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Carregando baterias...</td></tr>';
+            const batteries = await callViewFunction('listarBaterias'); // Usa callViewFunction que já tem a checagem
+            if (batteries === null) { // Se callViewFunction falhar (e.g., carteira desconectada)
+                 batteryListBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Falha ao carregar. Conecte a carteira.</td></tr>';
+                 return;
+             }
+            if (batteries.length === 0) {
+                batteryListBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhuma bateria registrada.</td></tr>';
+                return;
+            }
+
+
+            let html = '';
+            batteries.forEach(battery => {
+                html += `
+                    <tr>
+                        <td>${battery.id.toString()}</td>
+                        <td>${battery.serialNumber}</td>
+                        <td>${battery.tipo}</td>
+                        <td>${usoMap[Number(battery.uso)] || 'Desconhecido'}</td>
+                        <td>${battery.lote}</td>
+                        <td>${formatDateFromTimestamp(battery.dataProducao)}</td>
+                        <td>${formatDateFromTimestamp(battery.dataRegistro)}</td>
+                    </tr>
+                `;
+            });
+            batteryListBody.innerHTML = html;
+            showSuccess("Lista de baterias atualizada.");
+        }
+
+        async function updateDashboardStats() {
+            const count = await callViewFunction('getContagemTotal'); // Usa callViewFunction que já tem a checagem
+            if (count !== null) {
+                totalCountDisplay.textContent = count.toString();
+            } else {
+                 totalCountDisplay.textContent = 'N/A'; // Reset se falhar
+             }
+            // A chamada para owner foi removida
+        }
+
+
+        function displayBateriaDetalhes(battery) {
+            if (battery.id.toString() === "0" && battery.serialNumber === "") {
+                showError("Bateria com este ID não foi encontrada.");
+                bateriaDetalheCard.classList.add('hidden');
+                return;
+            }
+
+            const content = `
+                <ul>
+                    <li><strong>ID:</strong> ${battery.id.toString()}</li>
+                    <li><strong>Serial:</strong> ${battery.serialNumber}</li>
+                    <li><strong>Tipo:</strong> ${battery.tipo}</li>
+                    <li><strong>Uso:</strong> ${usoMap[Number(battery.uso)] || 'Desconhecido'}</li>
+                    <li><strong>Lote:</strong> ${battery.lote}</li>
+                    <li><strong>Data Prod.:</strong> ${formatDateFromTimestamp(battery.dataProducao)}</li>
+                    <li><strong>Data Reg.:</strong> ${formatDateFromTimestamp(battery.dataRegistro)}</li>
+                </ul>
+            `;
+            bateriaDetalheContent.innerHTML = content;
+            bateriaDetalheCard.classList.remove('hidden');
+            showSuccess(`Bateria ID ${battery.id.toString()} exibida.`);
+        }
+
+        function showSection(sectionId) {
+            registerSection.classList.add('hidden');
+            manageSection.classList.add('hidden');
+
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            showRegisterBtn.classList.remove('active');
+            showManageBtn.classList.remove('active');
+
+            if (sectionId === 'registerSection') {
+                showRegisterBtn.classList.add('active');
+            } else if (sectionId === 'manageSection') {
+                showManageBtn.classList.add('active');
+            }
+        }
+
+        // --- Mapeamento dos Botões ---
+
+        btnConnect.addEventListener('click', connectWallet);
+
+        // NAVEGAÇÃO
+        showRegisterBtn.addEventListener('click', () => showSection('registerSection'));
+        showManageBtn.addEventListener('click', () => {
+            showSection('manageSection');
+            // Atualiza os dados da aba ao clicar nela, se a carteira estiver conectada
+            if (provider || signer) {
+                 updateBatteryList();
+                 updateDashboardStats();
+             } else {
+                showError("Conecte sua carteira para ver os dados.");
+                batteryListBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Conecte sua carteira para ver as baterias.</td></tr>';
+                totalCountDisplay.textContent = 'N/A';
+             }
+            bateriaDetalheCard.classList.add('hidden');
+        });
+
+        // --- Aba "Registrar" ---
+
+        btnRegistrarBateria.addEventListener('click', async () => {
+            const tipo = document.getElementById('regTipo').value;
+            const uso = document.getElementById('regUso').value;
+            const serial = document.getElementById('regSerial').value;
+            const dataProdString = document.getElementById('regDataProd').value;
+            const lote = document.getElementById('regLote').value;
+
+            if (!tipo || uso === "" || !serial || !dataProdString || !lote) {
+                return showError("Por favor, preencha todos os campos para registrar.");
+            }
+
+            const dataProdTimestamp = formatInputDateToTimestamp(dataProdString);
+
+            await callWriteFunction('registrarBateria', [tipo, uso, serial, dataProdTimestamp, lote]);
+        });
+
+        // --- Aba "Gerenciar" ---
+
+        btnRemoverBateria.addEventListener('click', async () => {
+            const serial = document.getElementById('remSerial').value;
+            if (!serial) {
+                return showError("Por favor, informe o Serial Number para remover.");
+            }
+            await callWriteFunction('removerBateria', [serial]);
+            document.getElementById('remSerial').value = '';
+            bateriaDetalheCard.classList.add('hidden');
+        });
+
+        btnGetBateria.addEventListener('click', async () => {
+            const id = document.getElementById('getBatId').value;
+            if (!id) {
+                return showError("Por favor, informe o ID da bateria.");
+            }
+            const result = await callViewFunction('getBateria', [id]); // Usa callViewFunction que já tem a checagem
+             if (result !== null) { // Só exibe se a função não retornar erro/null
+                 displayBateriaDetalhes(result);
+             }
+        });
+
+        btnGetContagemTotal.addEventListener('click', async () => {
+            const count = await callViewFunction('getContagemTotal'); // Usa callViewFunction que já tem a checagem
+            if (count !== null) { // Só atualiza se a função não retornar erro/null
+                 totalCountDisplay.textContent = count.toString();
+                 showSuccess("Contagem total atualizada.");
+             }
+        });
+
+        btnListarBaterias.addEventListener('click', updateBatteryList); // updateBatteryList já usa callViewFunction
+
+        // btnGetOwner listener removido
+
+        // Inicializa o frontend
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('registerSection');
+            // Tenta conectar automaticamente se já tiver permissão
+             if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                 //connectWallet(); // Descomente se quiser tentar conectar ao carregar
+             }
+        });
+
+    </script>
+
+</body>
+</html>
