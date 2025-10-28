@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DApp • Bateria Defeitos</title>
+<style>
+  :root{
+    --bg1:#0f1226; --bg2:#1b1f3a;
+    --card:#101426cc; --border:#2b2f55;
+    --text:#e7e9ff; --muted:#a8adff;
+    --accent:#7c5cff; --accent-2:#3bf0d4; --danger:#ff6b6b;
+    --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--text);
+    font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial;
+    background:
+      radial-gradient(1200px 800px at 10% -10%, #1d1e44 0%, transparent 60%),
+      radial-gradient(900px 600px at 110% 20%, #0c3a3a 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  .container{width:min(1100px, 100%); display:grid; gap:14px; grid-template-columns:1fr}
+  @media (min-width: 900px){ .container{ grid-template-columns: 1fr 1fr } .span-2{grid-column:1/-1} }
+
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding:16px;
+  }
+  header.card{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+  .brand{display:flex; align-items:center; gap:12px}
+  .logo{width:38px;height:38px;border-radius:10px;
+    background: conic-gradient(from 180deg, var(--accent), var(--accent-2) 60%, var(--accent) 100%);
+    box-shadow:0 0 24px rgba(123,92,255,.5), inset 0 0 18px rgba(59,240,212,.35);
+  }
+  h1{font-size: clamp(16px, 2vw, 20px); margin:0; letter-spacing:.3px}
+  .muted{color:var(--muted); font-size:12px}
+
+  .section-title{font-weight:700; letter-spacing:.3px; margin:6px 0 8px}
+  label{font-size:12px; color:var(--muted); display:block; margin:8px 0 6px}
+  input[type="text"], input[type="number"]{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2c305a; background:#0e1230; color:#e7e9ff;
+    outline:none; transition: box-shadow .2s, border-color .2s;
+  }
+  input::placeholder{color:#8187c4}
+  input:focus{border-color:#5560ff; box-shadow:0 0 0 4px rgba(123,92,255,.15)}
+
+  .btn{
+    border:1px solid #2c305a; background:linear-gradient(180deg,#22286a,#1a1f55); color:#fff;
+    padding:11px 14px; border-radius:12px; cursor:pointer; font-weight:600; letter-spacing:.2px;
+    transition: transform .05s ease, box-shadow .2s ease, border-color .2s; user-select:none; white-space:nowrap;
+  }
+  .btn:hover{box-shadow:0 8px 28px rgba(124,92,255,.25)}
+  .btn:active{transform: translateY(1px) scale(.99)}
+  .btn[disabled]{opacity:.6; cursor:not-allowed; filter:grayscale(.2)}
+  .btn-primary{background:linear-gradient(180deg, #7c5cff, #5640ff); border-color:#6c57ff}
+  .btn.block{display:block; width:100%}
+  .stack{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .grow{flex:1}
+  .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background:#0c1238; border:1px solid #2c305a; color:#d2d6ff; font-size:12px}
+  .dot{width:8px;height:8px;border-radius:99px;background:#3bf0d4; box-shadow:0 0 10px #3bf0d4aa}
+  .dot.red{background:#ff6b6b; box-shadow:0 0 10px #ff6b6baa}
+
+  .result{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size:14px; background:#0a0f2b; border:1px dashed #39407e; border-radius:12px; padding:12px;
+    word-break:break-word; color:#d7dbff;
+  }
+  .helper{font-size:12px;color:#9aa0ff;margin-top:6px}
+
+  /* tabela responsiva */
+  table{width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:8px}
+  thead th{font-size:12px; color:#aeb3ff; font-weight:700; text-align:left; padding:4px 8px}
+  tbody tr{background:#0a0f2b; border:1px solid #2f3570}
+  tbody td{padding:10px 8px; border-top:1px solid #2f3570; border-bottom:1px solid #2f3570}
+  tbody tr:first-child td{border-top-left-radius:12px; border-top-right-radius:12px}
+  tbody tr:last-child td{border-bottom-left-radius:12px; border-bottom-right-radius:12px}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+
+  .toasts{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:9999}
+  @media (max-width: 600px){ .toasts{left:16px; right:16px} }
+  .toast{padding:12px 14px; border-radius:12px; background:#0f1436; border:1px solid #2f3570; color:#e9ebff; box-shadow: var(--shadow)}
+  .toast.ok{border-color:#2f7a6f}
+  .toast.err{border-color:#7a2f2f}
+  .toast small{display:block; color:#aab0ff; margin-top:6px}
+  .fade-in{animation: fade .2s ease}
+  @keyframes fade { from{opacity:0; transform: translateY(4px)} to{opacity:1; transform:translateY(0)} }
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header class="card span-2">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>DApp • Bateria Defeitos</h1>
+          <div class="muted">Cadastrar, listar e buscar por ID • ethers v6</div>
+        </div>
+      </div>
+      <div class="stack">
+        <span id="netPill" class="pill"><span class="dot red"></span><span id="netLabel">desconectado</span></span>
+        <button id="btnConnect" class="btn btn-primary">Conectar carteira</button>
+      </div>
+    </header>
+
+    <!-- CONFIG -->
+    <section class="card span-2">
+      <div class="stack" style="gap:12px; align-items:flex-end">
+        <div class="grow">
+          <label for="contractAddress">Endereço do contrato</label>
+          <input id="contractAddress" type="text" placeholder="0xSeuContratoAqui..." />
+        </div>
+        <button id="btnLoad" class="btn btn-primary">Carregar</button>
+      </div>
+
+      <details style="margin-top:10px">
+        <summary class="muted" style="cursor:pointer">Ver ABI usada</summary>
+        <pre class="result" id="abiBox" style="white-space:pre-wrap; margin-top:8px"></pre>
+      </details>
+
+      <div id="status" class="result" style="margin-top:10px">aguardando conexão…</div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="card span-2">
+      <div class="stack" style="gap:12px; flex-wrap:wrap">
+        <div class="grow">
+          <div class="section-title">Sua conta</div>
+          <div id="accountBox" class="result mono">—</div>
+        </div>
+        <div class="grow">
+          <div class="section-title">Saldo (carteira)</div>
+          <div id="balanceBox" class="result">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CADASTRAR -->
+    <section class="card">
+      <div class="section-title">Cadastrar bateria</div>
+      <label for="nSerieInput">Nº de série</label>
+      <input id="nSerieInput" type="text" placeholder="ex.: NS-123456" />
+      <label for="loteInput" style="margin-top:8px">Lote</label>
+      <input id="loteInput" type="text" placeholder="ex.: LOTE-2025-A" />
+      <button id="btnSet" class="btn btn-primary block" style="margin-top:10px" disabled>Cadastrar</button>
+      <div id="txBoxSet" class="result" style="margin-top:10px; display:none"></div>
+      <div class="helper">Chama <code>set(string nSerie, string lote)</code>.</div>
+    </section>
+
+    <!-- BUSCAR POR ID -->
+    <section class="card">
+      <div class="section-title">Buscar por ID</div>
+      <label for="idGet">ID (índice)</label>
+      <input id="idGet" type="number" min="0" placeholder="ex.: 0" />
+      <button id="btnGet" class="btn block" style="margin-top:10px" disabled>Consultar</button>
+      <div id="readBox" class="result" style="margin-top:10px; display:none"></div>
+      <div class="helper">Chama <code>get(uint256)</code>.</div>
+    </section>
+
+    <!-- LISTAGEM -->
+    <section class="card span-2">
+      <div class="stack" style="justify-content:space-between; align-items:center">
+        <div class="section-title">Lista de baterias</div>
+        <button id="btnListar" class="btn">Atualizar lista</button>
+      </div>
+      <div id="listStatus" class="helper">Carregue o contrato e clique em “Atualizar lista”.</div>
+
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:80px">ID</th>
+              <th>Nº de série</th>
+              <th>Lote</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyBats"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+  <!-- ethers.js UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <script>
+    // ===== ABI =====
+    const ABI = [
+      {"inputs":[{"internalType":"uint256","name":"_id","type":"uint256"}],"name":"get","outputs":[{"components":[{"internalType":"string","name":"nSerie","type":"string"},{"internalType":"string","name":"lote","type":"string"}],"internalType":"struct BateriaDefeitos.Bateria","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
+      {"inputs":[{"internalType":"string","name":"_nSerie","type":"string"},{"internalType":"string","name":"_lote","type":"string"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[],"name":"listar","outputs":[{"components":[{"internalType":"string","name":"nSerie","type":"string"},{"internalType":"string","name":"lote","type":"string"}],"internalType":"struct BateriaDefeitos.Bateria[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"}
+    ];
+
+    // ===== Helpers UI =====
+    const $ = (s)=>document.querySelector(s);
+    const toasts = $("#toasts");
+    function toast(msg, type='ok', small=''){
+      const el = document.createElement('div');
+      el.className = `toast fade-in ${type==='err'?'err':'ok'}`;
+      el.innerHTML = `<div>${msg}</div>${small?`<small>${small}</small>`:''}`;
+      toasts.appendChild(el);
+      setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(4px)'; }, 4200);
+      setTimeout(()=> el.remove(), 4600);
+    }
+    function setNet(label, ok){
+      $("#netLabel").textContent = label;
+      const dot = $("#netPill .dot"); dot.classList.toggle('red', !ok);
+    }
+    function show(el, yes=true){ el.style.display = yes ? '' : 'none'; }
+    function esc(s){ return s.replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // ===== State =====
+    let provider=null, signer=null, account=null, contract=null;
+
+    // ===== Elements =====
+    const btnConnect=$("#btnConnect"), btnLoad=$("#btnLoad"), btnSet=$("#btnSet"), btnGet=$("#btnGet"), btnListar=$("#btnListar");
+    const contractAddress=$("#contractAddress"), statusEl=$("#status"), abiBox=$("#abiBox");
+    const accountBox=$("#accountBox"), balanceBox=$("#balanceBox");
+    const nSerieInput=$("#nSerieInput"), loteInput=$("#loteInput");
+    const idGet=$("#idGet"), readBox=$("#readBox");
+    const tbodyBats=$("#tbodyBats"), listStatus=$("#listStatus");
+    const txBoxSet=$("#txBoxSet");
+
+    abiBox.textContent = JSON.stringify(ABI, null, 2);
+
+    // ===== Wallet =====
+    function ensureEthereum(){
+      if(!window.ethereum){
+        toast("MetaMask não encontrada.", "err", "Instale a extensão ou use um navegador compatível.");
+        statusEl.textContent = "MetaMask ausente";
+        return false;
+      }
+      return true;
+    }
+
+    async function connectWallet(){
+      if(!ensureEthereum()) return;
+      try{
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accs = await provider.send("eth_requestAccounts", []);
+        account = accs[0];
+        signer = await provider.getSigner();
+        const network = await provider.getNetwork();
+        setNet(`${network.name || 'rede'} (#${network.chainId})`, true);
+        accountBox.textContent = account;
+        const bal = await provider.getBalance(account);
+        balanceBox.textContent = `${ethers.formatEther(bal)} ETH`;
+        statusEl.textContent = "Carteira conectada. Informe o endereço do contrato e clique em Carregar.";
+        btnSet.disabled = true; btnGet.disabled = true;
+        toast("Carteira conectada!");
+      }catch(e){
+        console.error(e);
+        toast("Falha ao conectar carteira.", "err", e.shortMessage || e.message);
+        setNet("desconectado", false);
+      }
+    }
+
+    async function loadContract(){
+      const addr = contractAddress.value.trim();
+      if(!addr || !ethers.isAddress(addr)){ toast("Endereço do contrato inválido.", "err"); return; }
+      try{
+        const runner = signer ?? provider;
+        if(!runner){ toast("Conecte a carteira primeiro.", "err"); return; }
+        contract = new ethers.Contract(addr, ABI, runner);
+        statusEl.textContent = `Contrato carregado: ${addr.slice(0,10)}…`;
+        btnSet.disabled = !signer;  // set é tx
+        btnGet.disabled = false;    // get é view
+        toast("Contrato carregado.");
+        await listar();
+      }catch(e){
+        console.error(e);
+        toast("Não foi possível inicializar o contrato.", "err", e.shortMessage || e.message);
+      }
+    }
+
+    // ===== Ações =====
+    async function setBateria(){
+      if(!contract || !signer){ toast("Contrato não carregado ou carteira desconectada.", "err"); return; }
+      const ns = nSerieInput.value.trim();
+      const lt = loteInput.value.trim();
+      if(!ns || !lt){ toast("Preencha nº de série e lote.", "err"); return; }
+      try{
+        txBoxSet.textContent = "Enviando transação…"; show(txBoxSet, true);
+        const tx = await contract.connect(signer).set(ns, lt);
+        txBoxSet.textContent = `Tx enviada: ${tx.hash}\nAguardando confirmação…`;
+        const r = await tx.wait();
+        txBoxSet.textContent = `Confirmada no bloco ${r.blockNumber}\nTx: ${tx.hash}`;
+        toast("Bateria cadastrada!");
+        nSerieInput.value = ""; loteInput.value = "";
+        await listar();
+      }catch(e){
+        console.error(e);
+        txBoxSet.textContent = `Erro: ${e.shortMessage || e.message || e}`; show(txBoxSet, true);
+        toast("Falha ao cadastrar.", "err");
+      }
+    }
+
+    async function getById(){
+      if(!contract){ toast("Contrato não carregado.", "err"); return; }
+      const id = Number(idGet.value);
+      if(!Number.isInteger(id) || id < 0){ toast("ID inválido.", "err"); return; }
+      try{
+        const b = await contract.get(id);
+        readBox.innerHTML = `ID #${id}<br>Nº Série: <b>${esc(b.nSerie)}</b><br>Lote: <b>${esc(b.lote)}</b>`;
+        show(readBox, true);
+      }catch(e){
+        console.error(e);
+        readBox.textContent = `Erro: ${e.shortMessage || e.message || e}`; show(readBox, true);
+        toast("Falha ao consultar.", "err");
+      }
+    }
+
+    async function listar(){
+      if(!contract){ toast("Contrato não carregado.", "err"); return; }
+      try{
+        listStatus.textContent = "Carregando lista…";
+        tbodyBats.innerHTML = "";
+        const arr = await contract.listar(); // [{nSerie, lote}]
+        if(!arr.length){
+          listStatus.textContent = "Nenhum registro.";
+          return;
+        }
+        listStatus.textContent = `Total: ${arr.length}`;
+        arr.forEach((b, idx)=>{
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="mono">#${idx}</td>
+            <td>${esc(b.nSerie)}</td>
+            <td>${esc(b.lote)}</td>
+          `;
+          tbodyBats.appendChild(tr);
+        });
+      }catch(e){
+        console.error(e);
+        listStatus.textContent = "Falha ao carregar lista.";
+        toast("Falha ao listar.", "err", e.shortMessage || e.message);
+      }
+    }
+
+    // ===== Events =====
+    $("#btnConnect").addEventListener('click', connectWallet);
+    $("#btnLoad").addEventListener('click', loadContract);
+    $("#btnSet").addEventListener('click', setBateria);
+    $("#btnGet").addEventListener('click', getById);
+    $("#btnListar").addEventListener('click', listar);
+
+    if(window.ethereum){
+      window.ethereum.on?.('accountsChanged', async (accs)=>{
+        if(!accs?.length){ setNet("desconectado", false); accountBox.textContent="—"; balanceBox.textContent="—"; return; }
+        account = accs[0]; accountBox.textContent = account;
+        if(provider){ const bal = await provider.getBalance(account); balanceBox.textContent = `${ethers.formatEther(bal)} ETH`; }
+        toast("Conta alterada.");
+      });
+      window.ethereum.on?.('chainChanged', async (_chainId)=>{
+        if(provider){ const network = await provider.getNetwork(); setNet(`${network.name || 'rede'} (#${network.chainId})`, true); toast(`Rede alterada: #${network.chainId}`); }
+      });
+    }
+
+    // ===== Init =====
+    (function init(){
+      $("#abiBox").textContent = JSON.stringify(ABI, null, 2);
+      statusEl.textContent = "Conecte a carteira para começar.";
+      setNet("desconectado", false);
+    })();
+  </script>
+</body>
+</html>
