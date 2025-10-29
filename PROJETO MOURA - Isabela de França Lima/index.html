@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baterias Moura Defeituosas</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0A0A0A;
+      color: #F1F1F1;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background: linear-gradient(145deg, #111111, #0c0c0c);
+      border: 1px solid #1e1e1e;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    }
+    .btn-primary {
+      background-color: #0033A0;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #002a80;
+    }
+    .btn-secondary {
+      background-color: #FFD100;
+      color: #000;
+    }
+    .btn-secondary:hover {
+      background-color: #e6bc00;
+    }
+    .accent-text {
+      color: #FFD100;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background-color: #0033A0;
+      color: white;
+    }
+    td, th {
+      border: 1px solid #222;
+      padding: 0.75rem;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center p-6 space-y-6">
+
+  <header class="text-center mb-4">
+    <h1 class="text-4xl font-extrabold text-white mb-2">🔋 Baterias Moura Defeituosas</h1>
+    <p class="text-gray-400">Sistema de registro e consulta de baterias</p>
+  </header>
+
+  <!-- Registrar -->
+  <section class="card p-6 w-full max-w-2xl">
+    <h2 class="text-2xl font-bold mb-4 accent-text">Registrar Nova Bateria</h2>
+    <form id="formRegistrar" class="space-y-3">
+      <input type="text" id="tipoUso" placeholder="Tipo de Uso" class="w-full p-2 rounded bg-gray-900 border border-gray-700" required>
+      <input type="text" id="numeroSerie" placeholder="Número de Série" class="w-full p-2 rounded bg-gray-900 border border-gray-700" required>
+      <input type="text" id="dataProducao" placeholder="Data de Produção" class="w-full p-2 rounded bg-gray-900 border border-gray-700" required>
+      <input type="text" id="lote" placeholder="Lote" class="w-full p-2 rounded bg-gray-900 border border-gray-700" required>
+      <button type="submit" class="w-full py-2 rounded btn-primary font-semibold">Registrar Bateria</button>
+    </form>
+  </section>
+
+  <!-- Total -->
+  <section class="card p-6 w-full max-w-2xl flex justify-between items-center">
+    <h2 class="text-xl font-semibold">Total de Baterias</h2>
+    <span id="totalBaterias" class="text-3xl font-bold accent-text">--</span>
+  </section>
+
+  <!-- Consultar -->
+  <section class="card p-6 w-full max-w-2xl">
+    <h2 class="text-2xl font-bold mb-4 accent-text">Consultar por Índice</h2>
+    <form id="formConsultar" class="flex space-x-3">
+      <input type="number" id="indice" placeholder="Índice" class="flex-1 p-2 rounded bg-gray-900 border border-gray-700" required>
+      <button type="submit" class="btn-secondary px-4 py-2 rounded font-semibold">Buscar</button>
+    </form>
+    <div id="resultadoConsulta" class="mt-4 text-sm text-gray-300"></div>
+  </section>
+
+  <!-- Listagem -->
+  <section class="card p-6 w-full max-w-5xl">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold accent-text">Lista de Baterias</h2>
+      <button id="btnListar" class="btn-primary px-4 py-2 rounded font-semibold">Atualizar Lista</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo de Uso</th>
+            <th>Número de Série</th>
+            <th>Data de Produção</th>
+            <th>Lote</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBaterias" class="bg-gray-900 text-gray-100"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="mt-6 text-gray-500 text-sm">
+    Desenvolvido com 💙 e ⚡ pelas cores da Moura
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
