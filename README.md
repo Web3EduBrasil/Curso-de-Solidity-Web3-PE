@@ -1,5 +1,6 @@
-# Curso-de-Solidity---Web3-PE-2-Edi-o
-A transformação digital avança em direção a modelos cada vez mais descentralizados, transparentes e autônomos. Este curso intensivo de 24 horas prepara profissionais, estudantes e entusiastas para compreender os fundamentos da Web3 e desenvolver contratos inteligentes com Solidity.
+# Solidity Course — Web3 PE — 2nd Edition
+
+Digital transformation is advancing toward increasingly decentralized, transparent, and autonomous models. This 24-hour intensive course prepares professionals, students, and enthusiasts to understand the fundamentals of Web3 and develop smart contracts with Solidity.
 
 Impact Report — Web3 PE (2nd Edition)
 
