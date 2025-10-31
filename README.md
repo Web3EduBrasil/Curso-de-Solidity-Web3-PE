@@ -12,6 +12,12 @@
 
 ---
 
+## Photos from the Course
+
+All photos from this edition are versioned in the repository at:
+
+- [`./Photos from the Course/`](./Photos%20from%20the%20Course/) ← click to browse the files
+
 ## Table of Contents
 
 - [Overview](#overview)  
